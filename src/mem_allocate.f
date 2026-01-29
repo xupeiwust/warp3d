@@ -12,7 +12,7 @@ c     *                                                              *
 c     ****************************************************************
 c
       subroutine mem_allocate( itype )
-      use global_data ! old common.main
+      use global_data 
 c
       use main_data
       use contact, only : contact_cause, maxcontact, contact_force
@@ -257,16 +257,14 @@ c
          end if
 c
 c              global elements table (props, iprops, lprops )
-c              we use mkl_malloc to obtain a better aligned
-c              array. WARP3D must have mkl working so we can
-c              use mkl_malloc
 c
       case( 11 )
-         if( ptr_iprops .ne. 0 ) call mkl_free( ptr_iprops )
+         if( allocated( iprops_store ) ) deallocate( iprops_store )
          local_isize = 4*noelem*mxelpr
-         ptr_iprops = mkl_malloc( local_isize, 64 )
-         ptr_props  = ptr_iprops
-         ptr_lprops = ptr_iprops
+         allocate( iprops_store(local_isize) )
+         ptr_iprops = loc( iprops_store(1) )
+         ptr_props  = loc( iprops_store(1) )
+         ptr_lprops = loc( iprops_store(1) )
          mxel = noelem
 c
 c              allocate the diagonal mass vectors.

@@ -29,7 +29,6 @@ c               they own.
 c             Non-MPI:                                                          
 c               these are dummy routines which return immediately               
 c                                                                               
-      call wmpi_alert_slaves ( 6 )                                              
 c                                                                               
 c             update diagonal terms of element stiffness                        
 c             matrices to include nodal mass scaled by                          

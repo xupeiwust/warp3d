@@ -36,12 +36,7 @@ c
      &                     matchs_exact
       double precision :: dumd
 c
-c                       MPI: initialize all processors
-c                       and make workers go into the worker handler. if
-c                       else   wmpi_init is a dummy routine.
-c
       call t_init_performance
-      call wmpi_init ! turns off MPI. wmpi.. routines are dummies
 c
 c                       initialize the load step timing and debug
 c
@@ -1251,8 +1246,7 @@ c
 c
 c          uexternaldb for Abaqus compatible support
 c
-      douextdb = 2   ! in common. tell uexternaldb to terminate
-      call wmpi_do_uexternaldb
+      douextdb = 2  
 c
 c         MPI:
 c            tell workers we are ending now and then stop.
@@ -1261,185 +1255,15 @@ c
       call die_gracefully
 c
       end
-c
-c
-c            dummy veresions of all the MPI routines possibly
-c            still called in WARP3D.
-c
 c     ****************************************************************
 c     *                                                              *
-c     *                      subroutine wmpi_init                    *
+c     *           system wide terminate. modify as needed            *
 c     *                                                              *
-c     *                       written by : asg                       *
+c     *                       written by : rhd                       *
 c     *                                                              *
-c     *                   last modified : 03/2/98                    *
-c     *                                                              *
-c     *         This version is for serial version of warp3d.        *
-c     *         This sets the id of the only processor to 0, and     *
-c     *         sets the number of processors to 1.                  *
+c     *                   last modified : 01/19/26 rhd               *
 c     *                                                              *
 c     ****************************************************************
-c
-c
-      subroutine wmpi_init
-      use global_data, only : myid, numprocs, root_processor, 
-     &                        worker_processor, use_mpi
-c
-c              setup so no real MPI calls are made. 
-c              over time, all calls to these routines will be removed
-c              throughout the code.
-c 
-      myid = 0
-      numprocs = 1
-      root_processor = .true.
-      worker_processor = .false.
-      use_mpi = .false.
-      return
-      end
-c
-      subroutine wmpi_wait
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_suspend(option)
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_alert_slaves ( do_it )
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_reduce_vec ( in, size )
-      implicit integer (a-z)
-      double precision   in(*)
-      return
-      end
-c
-      subroutine wmpi_allreduce_dble( vec, size )
-      implicit integer (a-z)
-      double precision :: vec(*)
-      return
-      end
-c
-      subroutine wmpi_allreduce_real( vec, size )
-      implicit integer (a-z)
-      real :: vec(*)
-      return
-      end
-c
-      subroutine wmpi_allreduce_int( vec, size )
-      implicit integer (a-z)
-      integer :: vec(*)
-      return
-      end
-c
-      subroutine wmpi_reduce_vec_inplace( vec, size )
-      implicit integer (a-z)
-      double precision :: vec(*)
-      return
-      end
-c
-      subroutine wmpi_reduce_vec_std ( in, size )
-      implicit integer (a-z)
-      double precision   in(*)
-      return
-      end
-c
-      subroutine wmpi_dotprod ( in )
-      implicit integer (a-z)
-      double precision    in
-      return
-      end
-c
-      subroutine wmpi_redint ( int )
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_redlog ( log_var )
-      implicit integer (a-z)
-      logical log_var
-      return
-      end
-c
-      subroutine wmpi_bcast_int (int_var)
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_bcast_log (log_var)
-      implicit integer (a-z)
-      logical log_var
-      return
-      end
-c
-      subroutine wmpi_allreduce_vec_log( vec, size )
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_do_uexternaldb
-      return
-      end
-c
-      subroutine wmpi_send_basic
-      return
-      end
-c
-      subroutine wmpi_send_analysis
-      return
-      end
-c
-      subroutine wmpi_send_const
-      return
-      end
-c
-      subroutine wmpi_send_iter1
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_send_itern
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_send_step
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_send_temp_eqloads
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine wmpi_send_contact (ldum)
-      logical ldum
-      return
-      end
-c
-      subroutine wmpi_send_growth ( killed_this_time )
-      logical killed_this_time
-      return
-      end
-c
-      subroutine wmpi_growth_init
-      logical killed_this_time
-      return
-      end
-c
-      subroutine wmpi_get_grow
-      logical killed_this_time
-      return
-      end
-c
-      subroutine wmpi_calc_dist
-      return
-      end
 c
       subroutine die_gracefully
       stop
@@ -1450,106 +1274,3 @@ c
       stop
       return
       end
-c
-      subroutine wmpi_combine_stf
-      return
-      end
-c
-      subroutine wmpi_get_str (int_var)
-      return
-      end
-c
-      subroutine wmpi_get_initial_state
-      return
-      end
-c
-      subroutine wmpi_send_reopen
-      return
-      end
-c
-      subroutine wmpi_scatter_pcm
-      return
-      end
-c
-      subroutine wmpi_send_jint
-      return
-      end
-c
-      subroutine wmpi_contact_gthr
-      return
-      end
-c
-      subroutine wmpi_bcast_string ( string, nchars )
-      implicit integer (a-z)
-      character(len=*) :: string
-      return
-      end
-c
-      subroutine wmpi_set_mkl_threads(num)
-      implicit none
-      integer :: num
-      return
-      end 
-c
-      subroutine wmpi_set_omp_threads(num)
-      implicit none
-      integer :: num
-      return
-      end
-c
-      subroutine wmpi_reduce_real_max(vector,length)
-      implicit none
-      real :: vector(*)
-      integer :: length
-      return
-      end 
-c
-      subroutine wmpi_send_simple_angles
-      implicit none
-      return
-      end
-c
-      subroutine wmpi_send_crystals
-      implicit none
-      return
-      end
-c
-      subroutine wmpi_dealloc_crystals
-      implicit none
-      return
-      end 
-c
-      subroutine  wmpi_compute_set_history_locs
-      implicit none
-      return
-      end
-c
-      subroutine wmpi_init_owner
-      return
-      end
-c
-      subroutine wmpi_chknode ( node, referenced, owned )
-      implicit integer (a-z)
-      logical referenced, owned
-      referenced = .true.
-      owned = .true.
-      return
-      end
-c
-      subroutine cpardiso_symmetric( neq, ncoeff, k_diag, rhs,
-     &   solution_vec, eqn_coeffs, k_pointers, k_indices,
-     &   print_cpu_stats, itype, out, myrank )
-      implicit integer (a-z)
-      return
-      end
-c
-      subroutine cpardiso_unsymmetric( neqns, nnz, k_ptrs, k_indexes,
-     &            k_coeffs,  p_vec, u_vec, cpu_stats, itype, out,
-     &            myid )
-      implicit integer (a-z)
-      return
-      end
-c      
-      subroutine wmpi_handle_slaves                                             
-      return                                                                              
-      end                                                                       

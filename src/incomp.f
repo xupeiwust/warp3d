@@ -98,8 +98,7 @@ c
 c
 c          uexternaldb for Abaqus compatible support
 c
-      douextdb = 1  ! in common.main
-      call wmpi_do_uexternaldb
+      douextdb = 1  
 c
 c          compute the initial internal forces if not
 c          done already. we now just zero them - applied

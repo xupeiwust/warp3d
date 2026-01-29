@@ -318,8 +318,7 @@ c
 c
 c          run uexternaldb for Abaqus support
 c
-      douextdb = 3  ! in common.main. tells uexternal what to do
-      call wmpi_do_uexternaldb
+      douextdb = 3  
 c
 c          re-define the step temperature increment for nodes
 c          and elements in case we are in adaptive solution
@@ -537,7 +536,6 @@ c
 c          uexternaldb for Abaqus compatible support
 c
       douextdb = 4  ! mod_global
-      call wmpi_do_uexternaldb
 c
       if( adaptive ) dt = dt_original
 c

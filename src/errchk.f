@@ -1191,7 +1191,6 @@ c                send all processors copies of the contact information
 c             If we are using the serial version:
 c                return
 c
-      call wmpi_send_contact (.false.)
 c
       return
       end

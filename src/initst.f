@@ -4,7 +4,7 @@ c     *                      subroutine initst                       *
 c     *                                                              *
 c     *                       written by : bh                        *
 c     *                                                              *
-c     *                   last modified : 11/7/25 rhd                *
+c     *                   last modified : 1/28/2026 rhd              *
 c     *                                                              *
 c     *     at program startup, initializes various variables and    *
 c     *     arrays needed to set up the program correctly.           *
@@ -80,13 +80,10 @@ c
      &           ptsw, signsw, sbflg1, sbflg2
       logical, external :: isatty
 c
-c                       temporary fix until Intel fixes an inconsistency
-c                       in MKL. this call prevents lots of warning messages
-c                       from being printed during execution.
+c                       we only support threads now.
 c
-#ifdef KMP_ERROR
-      call kmp_set_warnings_off()
-#endif
+      myid = 0
+      numprocs = 1
 c
 c                       initialize the file input and output parameters
 c
@@ -157,9 +154,16 @@ c
       call scinit(nblank,reclen,endchr,promsw,echosw,comsw,atrdsw,
      &            eolsw,eofsw,menusw,ptsw,signsw)
 c
+c                        dummy allocate of the elements table.
+c                        it is resized after the number of .. 
+c                        command is processed.
+c
+      allocate( iprops_store(mxelpr*1) )
+      ptr_iprops = loc( iprops_store(1) )
+      ptr_props  = loc( iprops_store(1) )
+      ptr_lprops = loc( iprops_store(1) )
 c
 c                       set the element library.
-c
 c
       call setelb( nlibel, elelib, outmap, mxlbel, out)
 c
@@ -169,7 +173,6 @@ c
 c                       initialize strings with names of WARP3D
 c                       material models to use, for example in output
 c                       messages.
-c
 c
       lword= 32460
       rword= 1

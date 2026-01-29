@@ -4425,11 +4425,6 @@ c     *                                                              *
 c     *                   last modified : 4/16/2016 rhd              *
 c     *                   last modified : 2/2/2017 kbc               *
 c     *                                                              *
-c     *    called by wmpi_do_uexternaldb on both threads only        *
-c     *    and threads+mpi.  wmpi_do_uexternaldb located in          *
-c     *    directory linux_packages/source/mpi_code_dir              *
-c     *    files: mpi_code_dummy.f and mpi_code_real.f               *
-c     *                                                              *
 c     ****************************************************************
 c
       subroutine uexternaldb_mm04_cavity( lop, lrestart, gtime, gdtime,
