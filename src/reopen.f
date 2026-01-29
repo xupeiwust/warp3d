@@ -865,13 +865,6 @@ c                         analysis parameters data to the slave processors.
 c                         also send the element information to the
 c                         processor who owns the element.
 c
-      call wmpi_send_basic
-      call wmpi_send_const
-      call wmpi_send_analysis
-      call wmpi_send_reopen
-      call wmpi_init_owner
-      call wmpi_send_contact (.true.)
-      call wmpi_send_crystals
 c
 c                       initialize the adaptive algorithm so that
 c                       it can operate immediately if needed.
@@ -892,8 +885,7 @@ c
 c
 c                        uexternaldb for Abaqus compatible support
 c
-      douextdb = 6  ! common.main. tells uexgtern... what to do
-      call wmpi_do_uexternaldb
+      douextdb = 6 
 c
 9999  sbflg1 = .false.
       sbflg2 = .false.

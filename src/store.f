@@ -115,10 +115,6 @@ c                         element volumes, initial state arrays  back
 c                         to the root processor to store in the restart
 c                         database.
 c
-      call wmpi_get_str ( 2 )
-      call wmpi_get_str ( 4 )
-      call wmpi_get_str ( 5 )
-      if( initial_state_option ) call wmpi_get_initial_state
 c
 c                       after each block of data written on the file,
 c                       we write a record containing a 'check' variable
@@ -856,8 +852,7 @@ c
 c
 c          uexternaldb for Abaqus compatible support
 c
-      douextdb = 5  ! common.main. tells uexter.. what to do
-      call wmpi_do_uexternaldb
+      douextdb = 5  
 c
       call errmsg( 193, dum, dbname, dumr, dumd )
 c

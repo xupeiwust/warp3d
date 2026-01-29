@@ -41,9 +41,6 @@ c               alert MPI worker processors that we are in the tanstf routine.
 c               also send workers the step and iteration number                 
 c                                                                               
       if( local_debug ) write(*,*) '... start of tanstf...'                     
-      call wmpi_alert_slaves ( 4 )                                              
-      call wmpi_bcast_int ( now_step )                                          
-      call wmpi_bcast_int ( now_iter )                                          
 c                                                                               
       call thyme( 2, 1 )                                                        
 c                                                                               

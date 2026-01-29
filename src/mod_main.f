@@ -22,7 +22,7 @@ c     *                    f-90 module erflgs                        *
 c     *                                                              *
 c     *                       written by : rhd                       *
 c     *                                                              *
-c     *              last modified : 1/31/2022 rhd                   *
+c     *              last modified : 1/28/26 rhd                     *
 c     *                                                              *
 c     *     this small module replaces the old common.main           *
 c     *                                                              *
@@ -36,20 +36,15 @@ c
 c
 c              --- global single precision elements table (props) ---
 c
-c                  we use Cray pointers with implicit equivalencing
-c                  so we can continue to use iprops, props, lprops
-c                  variable names for the same space. Fortran pointers
-c                  will not allow this effective equivalencing.
-c                  we'll set mxel = noelem should mxel actually be
-c                  used.
-c
       integer :: mxel
-      integer :: iprops
-      real    :: props
-      logical :: lprops
-      pointer ( ptr_iprops, iprops(mxelpr,10000000) ),
-     &        ( ptr_props,  props(mxelpr,10000000) ),
-     &        ( ptr_lprops, lprops(mxelpr,10000000) )
+c      
+      integer*4, allocatable, target :: iprops_store(:)
+      integer*4 :: iprops
+      logical*4 :: lprops
+      real*4    :: props
+      pointer( ptr_iprops, iprops(mxelpr,1) )
+      pointer( ptr_props,  props(mxelpr,1)  )
+      pointer( ptr_lprops, lprops(mxelpr,1) )
 c
 c              --- double precision arrays/vectors ---
 c
@@ -81,9 +76,14 @@ c
      &    solver_out_of_core, show_details, new_analysis_param,
      &    sparse_stiff_output, sparse_stiff_binary, 
      &    sparse_research, solver_mkl_iterative, temperatures,
-     &    root_processor, slave_processor, worker_processor,
-     &    use_mpi, last_node_released, ! end of scalars
+     &    last_node_released, ! end of scalars
      &    trace(ntrc), convrg(10)
+c     
+      logical, parameter :: root_processor = .true.
+      logical, parameter :: worker_processor = .false.
+      logical, parameter :: use_mpi = .false.
+      logical, parameter :: slave_processor = .false.
+      
 c
 c
 c              --- integer arrays/vectors/scalars ---
@@ -97,7 +97,7 @@ c
      &    lodlst(mxlc), stprng(mxlc,2),
      &    bits(31), outmap(mxlbel,mxelmp),
      &    blk_ptr_head(0:max_procs - 1),
-     &    MPI_DOF_LOCAL(0:max_procs-1), num_dof_local(0:max_procs-1),
+     &    num_dof_local(0:max_procs-1),
      &    proc_pids(1:max_procs-1)     ! end of arrays
 c
       integer :: noelem, nonode, nummat, numcol,
@@ -107,7 +107,7 @@ c
      &    in, out, histep, lowstp, ltmstp, num_warn, num_error,
      &    num_fatal, solver_flag, old_solver_flag, solver_memory,
      &    num_threads,  max_mpc, max_mpc_tied,  node_causing_stop,
-     &    myid, numprocs, MPI_VAL, douextdb, mxnmbl,
+     &    myid, numprocs, douextdb, mxnmbl,
      &    current_load_time_step, solver_threads
 c
 c                  counters to shut off error messages at some point

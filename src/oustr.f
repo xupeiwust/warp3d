@@ -30,20 +30,7 @@ c                         Patran and flat files. Results are
 c                         written in pieces,                                    
 c                         with one piece (file) for each rank.                  
 c                                                                               
-      call wmpi_alert_slaves ( 35 )                                             
-      call wmpi_bcast_log( do_stress )                                             
-      call wmpi_bcast_log( ouflg )                                              
-      call wmpi_bcast_log( oubin )                                              
-      call wmpi_bcast_log( ouasc )                                              
-      call wmpi_bcast_log( ounod )                                              
-      call wmpi_bcast_int ( ltmstp ) ! load step number                         
-      call wmpi_bcast_string( stname, 8 )                                       
-      call wmpi_bcast_string( lsldnm, 8 )                                       
 c                                                                               
-      call wmpi_bcast_log( flat_file )                                          
-      call wmpi_bcast_log( stream_file )                                        
-      call wmpi_bcast_log( text_file )                                          
-      call wmpi_bcast_log( compressed )                                         
 c                                                                               
 c                       output stress or strain result files to                 
 c                       patran or flat files.                                   
@@ -126,8 +113,6 @@ c                         we need to gather all the stresses or strains
 c                         back to the root processor for printing.              
 c    
       do_strains = .not. do_stress                                                                           
-      if( do_stress )  call wmpi_get_str ( 2 )                                                
-      if( do_strains ) call wmpi_get_str ( 4 )                                                
 c                                                                               
 c                      read the integerlist of element numbers from             
 c                      input line.                                              

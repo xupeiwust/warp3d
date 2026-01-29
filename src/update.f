@@ -41,7 +41,6 @@ c
 c                                                                               
 c                       tell those workers to get in here.                       
 c                                                                               
-      call wmpi_alert_slaves (17)                                               
 c                                                                               
 c                       update displacements                                    
 c                                                                               

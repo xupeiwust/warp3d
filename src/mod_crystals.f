@@ -2140,7 +2140,6 @@ c
 c           If we're using MPI, send out the arrays (including the
 c           general crystal struct).  If not it's a dummy routine
 c
-      call wmpi_send_crystals
 c
       if( send_mess ) then
          write(out,'(a)') '>> Completed reading crystal definitions ...'
@@ -2393,7 +2392,6 @@ c
       if( allocated(simple_angles) ) deallocate(simple_angles)
       if( allocated(mc_array) ) deallocate(mc_array)
 c
-      call wmpi_dealloc_crystals
 c
       return
       end 

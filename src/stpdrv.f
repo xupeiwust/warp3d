@@ -74,10 +74,7 @@ c          growth by element extinction, then we need to check
 c          to see if the data structures have been allocated.
 c
       if( ltmstp .ge. 0) then
-         if ( new_constraints ) call wmpi_send_const
-         if ( new_analysis_param ) call wmpi_send_analysis
       end if
-      if( growth_by_kill ) call wmpi_growth_init
 c
 c          before this compute displ... command, the user may have
 c          changed the constraints.  if analysis uses crack
