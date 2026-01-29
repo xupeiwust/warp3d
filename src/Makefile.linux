@@ -83,7 +83,7 @@ MVC      = /bin/mv -f
 #                 PROFILE = -pg for use with gprof, -g for Intel Adviser
 #
 FTRAP      =
-INLINE     = -no-inline-factor # -fno-inline
+INLINE     = # -no-inline-factor # -fno-inline
 PROFILE    = -g
 PROFILE =
 OPT_REPORT = -qopt-report=5 -qopt-report-annotate=html -qopt-report-phase=vec
@@ -92,21 +92,18 @@ OPENMP     = -qopenmp -reentrancy
 CHECKFLOAT = -fpe0 -init=snan,arrays -fp-speculation=safe
 CHECKFLOAT =
 #
-#              the -diag-disable .. option suppresses message that ifort will
-#              be deprecated
-#
 ALL_PROCESSORS = -axAVX,CORE-AVX2,COMMON-AVX512 -xIVYBRIDGE \
                  -align array64byte  -qopt-zmm-usage=high
 HARDWARE_SPECIFIC = -xHOST  -align array64byte  -qopt-zmm-usage=high
 MACHINE_TYPE =  $(HARDWARE_SPECIFIC) # $(ALL_PROCESSORS)
-KMP_ERROR := KMP_ERROR    # temp fix for MKL to suppress warning messages
 #
-FCOPTS = -fpp -O3 -ip -fpconstant -fixed -72 -traceback -ftz $(CHECKFLOAT) \
+FCOPTS = -fpp -O3 -fpconstant -fixed -72 -traceback -ftz $(CHECKFLOAT) \
          $(MACHINE_TYPE) -module $(ODIR) $(FTRAP) \
-         $(INLINE) $(PROFILE) $(OPENMP) -diag-disable=10448
+         $(INLINE) $(PROFILE) $(OPENMP) 
 #
-FOR      = $(COMPILER) $(OPT_REPORT) $(FCOPTS) -D$(KMP_ERROR) -D$(OSNAME) 
-LINK     = $(COMPILER) $(FCOPTS)
+COMPILER = ifx
+FOR      = ifx $(OPT_REPORT) $(FCOPTS) -D$(OSNAME) 
+LINK     = ifx $(FCOPTS)
 #
 #                all system level module files that appear as separate *.f in WARP3D
 #                => does not include the user routine module .f for Abaqus

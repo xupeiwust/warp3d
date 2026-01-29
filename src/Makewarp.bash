@@ -2,8 +2,9 @@
 #
 #     Makewarp.bash (8 th version)
 #
-#     modified: November 4, 2025 RHD
+#     modified: January 13, 2026 rhd
 #               ** remove MPI support **
+#               ** use ifx compiler ** 
 #
 #     Description:
 #
@@ -35,14 +36,13 @@ GFORTRAN=no
 INTEL_FORTRAN=yes
 return
 }
-
 # ****************************************************************************
 #
-#   Function: Check Intel Fortran compiler exists & version
+#   Function: Check macOS Intel Fortran compiler exists & version
 #
 # ****************************************************************************
 #
-function check_Intel_Fortran_setup
+function check_macOS
 {
 if [ "$INTEL_FORTRAN" = "no" ]; then
  return
@@ -57,6 +57,7 @@ printf "... in the /etc/bashrc our your ~/.bashrc file.\n"
 printf "Quitting...\n\n"
 exit 1
 }
+#
 /bin/rm zqq03 >& /dev/null
 ifort --version -diag-disable=10448  >zqq03
 sed -i -e '2,10d' zqq03
@@ -75,6 +76,43 @@ if [ $ok -eq "0" ]; then
     printf "\n... ERROR: ifort must be one of these versions:"
     printf "\n... 2021..1 or newer"
     printf "\n... other versions have known bugs that affect WARP3D"
+    printf "\n... Quitting...\n\n"
+    exit 1
+fi
+#
+return
+}
+# ****************************************************************************
+#
+#   Function: Check Linux  Intel Fortran compiler exists & version
+#
+# ****************************************************************************
+#
+function check_Linux
+{
+#
+hash ifx 2>&- || {
+printf "[ERROR]\n"
+printf "... Cannot find the Intel Fortran compiler (ifx) in your PATH.\n"
+printf "... See Intel Fortran install documentation. Most often a line of\n"
+printf "... the form: source /opt/intel/... is placed\n"
+printf "... in the /etc/bashrc our your ~/.bashrc file.\n"
+printf "Quitting...\n\n"
+exit 1
+}
+/bin/rm zqq03 >& /dev/null
+ifx --version  >zqq03
+sed -i -e '2,$d' zqq03
+echo -e "\n... Intel Fortran (ifx) detected:" `cat zqq03`
+count2=`grep "2025" zqq03 |wc -l`
+/bin/rm zqq03*
+ok=0
+if [ $count2 -eq "1" ]; then
+   ok=1
+fi
+if [ $ok -eq "0" ]; then
+    printf "\n... ERROR: ifx must be one of these versions:"
+    printf "\n... 2025 or newer"
     printf "\n... Quitting...\n\n"
     exit 1
 fi
@@ -113,12 +151,12 @@ INTEL_FORTRAN=no
 GFORTRAN=no
 MKLQ=yes
 #
- COMPILER=ifort    # default
- ALTCOMPILER=ifort
+ COMPILER=ifx    # default
+ ALTCOMPILER=ifx
  MAKEFILE=Makefile.linux
  MPIQ=no
  #
-check_Intel_Fortran_setup
+check_Linux
 linux_simple
 # 
 return      
@@ -193,7 +231,7 @@ touch main_program.f
 
 #****************************************************************************
 #
-#     Function:   Global defaults and tests for macOS - OpenMP only
+#     Function:   Global defaults and tests for macOS -
 #
 # ****************************************************************************
 function mac_main
@@ -218,7 +256,7 @@ printf "This is not a Mac OS X system.\n Quitting...\n\n"
 exit 1
 fi
 #
-check_Intel_Fortran_setup
+check_macOS
 #
 # The MKL libraries must be present in WARP3D distribution directory
 #
@@ -304,7 +342,7 @@ osx_mkl_dir=$WARP3D_HOME/OSX_MKL_files
 #
 printf "\nSelect supported platform:\n"
 PS3="Select choice: "
-select opt in 'Linux (64-bit)' 'macOS (Intel)' 'Windows (10,11)' 'Exit'
+select opt in 'Linux ' 'macOS (Intel,Ventura)' 'Windows (10,11)' 'Exit'
 do
       case $REPLY in
             1 )   printf "\n"
