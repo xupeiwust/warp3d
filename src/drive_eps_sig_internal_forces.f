@@ -64,9 +64,6 @@ c             MPI:
 c               alert workers we are in the strain-
 c               stress-internal force routines.
 c
-      call wmpi_alert_slaves( 14 )
-      call wmpi_bcast_int( step )
-      call wmpi_bcast_int( iter )
 c
       call thyme( 6, 1 )
 c
@@ -245,9 +242,6 @@ c               so that if any element requested a step cutback, then
 c               all processors are aware of it.  Also reduce back the
 c               (scalar) internal energy to the root procaessor.
 c
-      call wmpi_redlog( material_cut_step )
-      call wmpi_reduce_vec( internal_energy, 1 )
-      call wmpi_reduce_vec( plastic_work, 1 )
 c
 c             scatter the element internal forces (stored in blocks) into
 c             the global vector (unless we are cutting step)
@@ -334,9 +328,6 @@ c              sum the worker contributions to the ifv terms,
 c              the number of ifv terms, and the whole ifv vector back
 c              on the root processor.
 c
-      call wmpi_reduce_vec( sum_ifv, 1 )
-      call wmpi_redint( num_term_ifv )
-      call wmpi_reduce_vec( ifv(1), nodof )
       if( local_debug_sums ) then
          if( root_processor ) write(out,9010) norm2( ifv )
       end if

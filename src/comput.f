@@ -188,12 +188,10 @@ c
         check_setup_cp = .false. 
         if( cp_elems_present ) then
           call mm10_set_history_locs                                          
-          call wmpi_compute_set_history_locs                                  
         end if                                                                 
       end if                                                                    
 c                                                                               
 c              add more setups here ... may need to add another                 
-c              wmpi_... routine as well                                         
 c                                                                               
       return                                                                    
       end                                                                       

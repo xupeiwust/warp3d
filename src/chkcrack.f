@@ -385,7 +385,6 @@ c             Also have processors kill any elements
 c             which they own which should be killed.                            
 c             this is a dummy for non-MPI                                      
 c                                                                               
-      call wmpi_send_growth( killed_this_time )                                
 c                                                                               
 c         (8) if limit on number of killed elements is exceeded,
 c             stop the solution.

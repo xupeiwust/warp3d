@@ -47,15 +47,12 @@ c          if we are running in MPI:
 c            alert workers to enter this routine. process as described
 c          otherwise do serial
 c
-      call wmpi_alert_slaves( 30 )
 c
       if( myid .eq. 0 ) then
             do_it   = do_it_local
             orig_node = front_nodes(domain_origin)
       end if
 c
-      call wmpi_bcast_int( do_it )
-      call wmpi_bcast_int( orig_node )
 c
 c          do_it = 1 -- allocate and fill J thermal data structures
 c          do_it = 2 -- deallocate data structures
@@ -236,8 +233,6 @@ c             reduce nodal alpha_ij values to root and re-broadcast all
 c             for simplicity, each rank then computes nodal averages
 c             for all nodes in model
 c
-      call wmpi_allreduce_int( count_alpha, nonode )
-      call wmpi_allreduce_real( snode_alpha_ij, nonode*6 )
 c
       do snode = 1,nonode
          if( count_alpha(snode) .ne. 0 ) then
@@ -251,8 +246,6 @@ c             worker processor, set the flag on root to true. send
 c             reduced block_seg_curves logical vector to all ranks for
 c             later use during actual domain computations
 c
-      call wmpi_allreduce_vec_log( process_temperatures, 1 )
-      call wmpi_allreduce_vec_log( block_seg_curves, nelblk )
 c
 c             for temperature-dependent material properties, we need to
 c             make sure that root has the array data from which to obtain
@@ -275,8 +268,6 @@ c             But we only need to do this for the crack front orig_node,
 c             not the whole nonode vector.
 c
       if( process_temperatures ) then
-         call wmpi_reduce_real_max( seg_snode_e(orig_node), 1)
-         call wmpi_reduce_real_max( seg_snode_nu(orig_node), 1 )
       end if
 c
       if( debug ) then
@@ -619,19 +610,10 @@ c             calculations.
 c          if we are running in serial:
 c             this is just a dummy routine which immediately returns
 c
-      call wmpi_alert_slaves( 15 )
 c
 c          broadcast variables
 c
       if( myid .eq. 0 ) do_it = do_it_local
-      call wmpi_bcast_int( do_it )
-      call wmpi_bcast_log( temperatures ) ! just in case
-      call wmpi_bcast_log( temperatures_ref ) !    "
-      call wmpi_bcast_log( initial_state_option ) ! "
-      call wmpi_bcast_log( comput_j )
-      call wmpi_bcast_log( comput_i )
-      call wmpi_bcast_log( j_linear_formulation )
-      call wmpi_bcast_log( process_initial_state )
       j_geonl_formulation = .not. j_linear_formulation
 c
 c          if do_it = 2 -- deallocate all module J-data.
@@ -827,8 +809,6 @@ c                reduce vectors to root then broadcast to all.
 c                compute nodal average values. each rank thus has a
 c                complete copy for all model nodes.
 c
-      call wmpi_allreduce_int( extrap_counts, nonode )
-      call wmpi_allreduce_dble( swd_at_nodes, nonode )
 c
       do snode = 1, nonode
        if( extrap_counts(snode) .eq. 0 ) cycle
@@ -838,7 +818,6 @@ c
 
 c
       if( j_linear_formulation ) then
-        call wmpi_allreduce_dble( strain_at_nodes, 6*nonode )
         do snode = 1, nonode
           if( extrap_counts(snode) .eq. 0 ) cycle
           rc = one / dble( extrap_counts(snode) )
@@ -848,7 +827,6 @@ c
 
 c
       if( j_geonl_formulation ) then
-       call wmpi_allreduce_dble( displ_grad_at_nodes, 9*nonode )
         do snode = 1, nonode
           if( extrap_counts(snode) .eq. 0 ) cycle
           rc = one / dble( extrap_counts(snode) )

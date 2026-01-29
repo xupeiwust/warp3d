@@ -55,7 +55,6 @@ c              the former local_mdiag
 c              data structure was deleted with dropping the EBE                 
 c              solver                                                           
 c                                                                               
-      call wmpi_alert_slaves ( 8 )                                              
 c                                                                               
 c              intitialize the structure diagonal mass vector                   
 c                                                                               
@@ -147,8 +146,6 @@ c                   of mdiag and totvol into a full version on the
 c                   root processor.                                             
 c              non-MPI: everything here                                         
 c                                                                               
-      call wmpi_reduce_vec ( mdiag, nodof )                                     
-      call wmpi_reduce_vec ( totvol, 1 )                                        
 c                                                                               
 c              slaves leave now                                                 
 c                                                                               

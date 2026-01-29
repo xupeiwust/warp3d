@@ -35,7 +35,6 @@ c
 c                                                                               
 c         tell slaves we are about to assess contact                            
 c                                                                               
-      call wmpi_alert_slaves ( 29 ) 
 c                                                                               
 c          zero out all the contact forces.                                     
 c                                                                               
@@ -70,10 +69,9 @@ c
       count_nodes_active_contact = 0
 c                                                                                     
       do node = 1, nonode !  big outside loop                                                      
-c                                                                               
-c             skip node if not referenced by this processor                     
 c                                                                                                                                                              
-         call wmpi_chknode ( node, referenced, owned )            
+         referenced = .true.  ! left over from MPI
+         owned = .true.
 c                                                                               
          if( .not. referenced ) cycle                                          
 c                                                                               
@@ -217,7 +215,6 @@ c               now reduce the contact_force vector and the nodal
 c               transformation matrices caused by contact back to the           
 c               root processor                                                  
 c                                                                               
-      call wmpi_contact_gthr                                                    
 c                                                                               
       if( debug ) then                                                         
          if( root_processor) then                                              
@@ -269,7 +266,6 @@ c          if this subroutine was called from a place other than
 c          contact_find, then alert the slaves to remove effects of             
 c          nodal transformation matricies due to contact.                       
 c                                                                               
-      if ( call_others ) call wmpi_alert_slaves ( 11 )                          
 c                                                                               
 c          skip this routine if we dont have any contact.                       
 c                                                                               

@@ -58,8 +58,6 @@ c          if running parallel MPI:
 c             alert all workers to enter this routine, then send all
 c             data required for J-I calculations that is only on root.
 c
-      call wmpi_alert_slaves( 27 )
-      call wmpi_send_jint
 c
       if( debug_driver ) write(iout,*) ' >>> entered element driver'
 c
@@ -110,10 +108,6 @@ c
         iiterms = iiterms + iiterms_thrds(:,:,i)
       end do
 c
-      call wmpi_reduce_vec( diterms, size_j_values )
-      call wmpi_reduce_vec( iiterms(1,1), size_i_values**2 )
-      call wmpi_redint( skipped_killed )
-      call wmpi_redlog( face_loading )
 c
       if( worker_processor ) then
         if( allocated( q_values ) ) deallocate( q_values )
