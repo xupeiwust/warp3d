@@ -225,7 +225,7 @@ touch main_program.f
 #   run the makefile for Linux. we now pass more parameters to the makefile
 #
       printf "... Starting make program for Linux .... \n\n"
-      make -j $JCOMP -f $MAKEFILE COMPILER="$COMPILER" 
+      make -j $JCOMP -f $MAKEFILE 
 
 }
 

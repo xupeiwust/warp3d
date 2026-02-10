@@ -5,8 +5,9 @@
 #
 #   Developer: rdodds
 #
-#   Last modifications: November 15, 2025  (build number 4600)
+#   Last modifications: January 24, 2026  (build number 4600)
 #                       ** MPI support deprecated **
+#                          continued use of ifort 
 #
 #   How to run:
 #
@@ -22,11 +23,13 @@
 #     Links with the (free) Intel MKL library to access the PARDISO
 #     solver and LAPACK/BLAS routines
 #
-#     Build tested with: macOS Ventura 13.4.1
-#     Intel ifort 2021.9.0 20230302
+#     Build tested with: macOS Ventura 13.6
+#     Intel ifort 2021.10.0
 #     Intel MKL 2023.1 20230303 (included with WARP3D distribution)
 #
-#     How we handle MKL libraries. The few required libraries are
+#     How we handle MKL libraries--
+#
+#     The few required libraries are
 #     included in the WARP3D directory OSX_MKL_files.
 #     The build instructions below explicitly link these static
 #     libraries. Users of WARP3D on Mac (Intel) computers can thus 
@@ -72,7 +75,7 @@
 #
 #
 OSNAME   := OSX
-BUILDNUM := 5000
+BUILDNUM := 5000  #   removal of MPI 
 #
 ODIR = ././../obj_macOS
 EXE_NAME = warp3d.omp
@@ -107,16 +110,14 @@ LINKOPS2  = -static-intel -qopenmp-link=static \
             ${OSX_LIBDIR}/libiomp5.a \
             ${OSX_LIBDIR}/libmkl_intel_lp64.a \
             ${OSX_LIBDIR}/libmkl_intel_thread.a \
-            ${OSX_LIBDIR}/libmkl_core.a \
-            -L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib   
-#                ^^^ may not be needed on some macOS versions
-LINKOPS   = $(LINKOPS2) 
+            ${OSX_LIBDIR}/libmkl_core.a
+LINKOPS   = $(LINKOPS2) -Wl,-ld_classic  # classic loader 
 ALL_PROCESSORS = -axAVX,CORE-AVX2,COMMON-AVX512 -xIVYBRIDGE \
                        -align array64byte  -qopt-zmm-usage=high
 ALL_PROCESSORS = -axAVX,CORE-AVX2 -xIVYBRIDGE \
                        -align array64byte  -qopt-zmm-usage=high
 HARDWARE_SPECIFIC = -xHOST  -align array64byte  -qopt-zmm-usage=high
-MACHINE_TYPE =  $(HARDWARE_SPECIFIC) #$(ALL_PROCESSORS)
+MACHINE_TYPE =  $(ALL_PROCESSORS) # $(HARDWARE_SPECIFIC) 
 #
 FCOPTS   =  -O3 -fpp -fpconstant -fixed -72 -traceback $(PROFILE) \
             $(OPT_REPORT) -module $(ODIR) -ftz  $(MACHINE_TYPE) \
@@ -125,12 +126,10 @@ FCOPTS   =  -O3 -fpp -fpconstant -fixed -72 -traceback $(PROFILE) \
 FOR      = $(COMPILER) $(FCOPTS) -D$(KMP_ERROR) -D$(OSNAME) 
 LINK     = $(COMPILER) $(FCOPTS)
 #
-#
 #               all system level module files that appear as separate *.f
 #               in WARP3D
 #               => does not include the user routine module .f for Abaqus
 #                  compatible routines. see it later down in this file.
-#
 #
 MODS     := $(OD)/mod_adaptive_steps.o \
 			$(OD)/mod_contact.o       \
@@ -419,7 +418,7 @@ $(OD)/main_program$O : main_program.f $(MODS) $(INCLUDES)
 #
   $(ODIR)/user_routines_module$O : user_routines_module.f
 	$(RMC)  $@
-	$(FOR)  $< -c -o $@
+	$(FOR)  -inline-level=1 $< -c -o $@
 
   $(OD)/user_routines_umat$O : user_routines_umat.f $(OD)/user_routines_module$O
 	$(RMC)  $@
@@ -428,17 +427,17 @@ $(OD)/main_program$O : main_program.f $(MODS) $(INCLUDES)
   $(OD)/user_routines_other_Abaqus$O : user_routines_other_Abaqus.f \
                                      $(OD)/user_routines_module$O
 	$(RMC)  $@
-	$(FOR) -heap-arrays $< -c -o $@
+	$(FOR) -inline-level=1 -heap-arrays $< -c -o $@
 
   $(OD)/user_routines_warp3d$O : user_routines_warp3d.f  include_usr_parm \
                                $(OD)/user_routines_module$O
 	$(RMC)  $@
-	$(FOR) -heap-arrays  $< -c -o $@
+	$(FOR) -inline-level=1 -heap-arrays  $< -c -o $@
 
   $(OD)/user_routines_support$O : user_routines_support.f  include_usr_parm \
                                 $(OD)/user_routines_module$O
 	$(RMC)  $@
-	$(FOR)  $< -c -o $@
+	$(FOR)  -inline-level=1 $< -c -o $@
 #
 #
 #

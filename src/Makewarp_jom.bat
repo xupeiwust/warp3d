@@ -21,10 +21,10 @@ cls
 ::
 ::   This script builds a 64-bit version of WARP3D.
 ::   It must be executed from within a command shell that has environment
-::   variables initialed to use the 64-bit version of the Intel ifort
-::   compiler suite which now inclues the MKL math library.
+::   variables initialed to use the 64-bit version of the Intel ifx
+::   compiler suite which includes the MKL math library.
 ::
-::   This set up works ** only ** for Intel ifort compiler.
+::   This set up works ** only ** for Intel ifx compiler.
 ::
 :: ****************************************************************************
 ::
@@ -73,57 +73,6 @@ set build_mode=64
 ::
 ::   ==================================================================
 ::
-::	Install dummy MPI code for Windows -- we do not yet
-::      support MPI and WARP3D on Windows.
-::
-  echo -- Uninstalling MPI code...
-  del .\mpi_code.f 
-  del .\mpi_handle_slaves.f
-  del .\mod_local_stiffness.f
-  del .\distributed_assembly.f
-::
-  set xdir=..\linux_packages\source\mpi_code_dir
-::
-  copy %xdir%\mpi_code_dummy.f .\mpi_code.f /y
-  echo        - mpi_code_dummy.f
-  copy %xdir%\mpi_handle_slaves_dummy.f .\mpi_handle_slaves.f /y
-  echo        - mpi_handle_slaves.f
-  copy %xdir%\mod_local_stiffness_dummy.f .\mod_local_stiffness.f /y
-  echo        - mod_local_stiffness.f
-  copy %xdir%\distributed_assembly_dummy.f .\distributed_assembly.f /y
-  echo        - distributed_assembly.f
-: 
-:
-::
-  echo -- MPI code uninstalled...
-  echo.
-::
-::   ==================================================================
-::
-::	Install dummy hypre code for Windows -- we do not yet
-::      support hypre and WARP3D on Windows.
-::
-  echo -- Uninstalling hypre code...
-  if  exist .\hypre_driver.f (
-      del .\hypre_driver.f
-     )
-  if  exist  .\hypre_warp_only.f (
-      del  .\hypre_warp_only.f
-     )
-  if  exist  .\iterative_sparse_hypre.f (
-      del  .\iterative_sparse_hypre.f
-     )
-::
-  set xdir=..\linux_packages\source\hypre_code_dir
-::
-  copy %xdir%\dummy_sparse_hypre.f .\iterative_sparse_hypre.f /y
-  echo        - dummy_sparse_hypre.f
-::
-  echo -- hypre code uninstalled...
-  echo.
-::
-::   ==================================================================
-::
 ::	Run the makefile.
 ::
 ::  touch main so it always gets compiled. internally gets date/time
@@ -137,7 +86,7 @@ if "%build_mode%" == "64" (
   echo.
   %jom_exe% /f Makefile.windows.nmake ARCH64=64 /J %jobs%
  )
-  del .\*.exe
+  del /Q /F .\*.pdb .\*.exe
 ::
   echo.
   echo.
