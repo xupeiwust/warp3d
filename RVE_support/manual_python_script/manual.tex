@@ -1,0 +1,900 @@
+
+\documentclass[11pt]{article}
+\usepackage{geometry} 
+\geometry{letterpaper}
+
+%---------------------------------------------
+\setlength{\textheight}{650pt}
+\setlength{\textwidth}{450pt}
+\setlength{\oddsidemargin}{14pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\setlength{\topmargin}{-0.5in}
+
+
+%----------------------------------------
+\usepackage{amsmath}
+\usepackage{layout}
+\usepackage{color}
+\usepackage{array}
+\usepackage{rotating}
+\usepackage[us,12hr]{datetime}
+\usepackage{lscape}  % for landscape pages in PDF
+
+
+%----------------------------------------------
+%\usepackage{fancyhdr} % \pagestyle{fancy}
+%\setlength\headheight{15pt}
+%\lhead{\small{\textit{Thermal Properties}}}
+%\rhead{\small{R. H. Dodds, Jr. (rhdodds@gmail.com)}}
+%\fancyfoot[L] {\small{\  Updated:  \today\ at \currenttime}}
+%\fancyfoot[C] {\thepage}
+%\fancyfoot[R] {\small{\textit{CTE Properties}}}
+
+%---------------------------------------------------
+\usepackage{graphicx}
+\usepackage[labelformat=empty]{caption}
+%\numberwithin{equation}{section}
+\usepackage{bm}
+
+%--------------------------------------------- 
+%     --- make section headers in helvetica ---
+%
+\usepackage{sectsty} 
+\usepackage{xspace}
+\allsectionsfont{\sffamily} 
+\sectionfont{\large}
+\usepackage[small,compact]{titlesec} % reduce white space around sections
+%---------------------------------------------->
+%
+%
+%   which fonts system for text and equations. with all commented,
+%   the default LaTex CM fonts are used
+%
+%
+\frenchspacing
+%\usepackage{pxfonts}  % Palatino text 
+%\usepackage{mathpazo} % Palatino text
+%\usepackage{txfonts}
+
+
+%---------  local commands ---------------------
+
+\newcommand{\ttt} {\texttt}  %typewriter text
+\newcommand{\bmf } {\boldsymbol }  %bold math symbol
+\newcommand{\bsf } [1]{\textrm{\textit{#1}}\xspace}
+\newcommand{\ul} {\underline}
+\newcommand{\hv} {\mathsf}   %helvetica text inside an equation
+\newcommand{\eg}{\emph{e.g.},\xspace}
+\newcommand{\ie}{\emph{i.e.},\xspace}
+\newcommand{\ti}{\emph}
+\newcommand{\vepsilon}{\varepsilon}
+\newcommand{\etal}{\ti{et al.}\xspace}
+\newcommand{\nid}{\noindent}
+\newcommand{\vareps}{\varepsilon}
+
+\newenvironment{offsetpar}[1]%  
+{\begin{list}{}%
+         {\setlength{\leftmargin}{#1}}%
+         \item[]%
+}
+{\end{list}}
+
+%
+%
+%        optional definition for bullet lists which
+%        reduces white space.
+%
+\newcommand{\squishlist}{
+ \begin{list}{$\bullet$}
+  { \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{3pt}
+     \setlength{\topsep}{3pt}
+     \setlength{\partopsep}{0pt}
+     \setlength{\leftmargin}{1.5em}
+     \setlength{\labelwidth}{1em}
+     \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishlisttwo}{
+ \begin{list}{$\bullet$}
+  { \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{0pt}
+    \setlength{\topsep}{0pt}
+    \setlength{\partopsep}{0pt}
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{1.5em}
+    \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishend}{
+  \end{list}  }
+%
+\newcounter{Lcount}
+\newcommand{\squishnum}{
+\begin{list}{\arabic{Lcount}. }
+{ \usecounter{Lcount}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{3pt}
+\setlength{\topsep}{3pt}
+\setlength{\partopsep}{0pt}
+\setlength{\leftmargin}{1in}
+\setlength{\labelwidth}{1em}
+\setlength{\labelsep}{0.5em} } }
+
+\makeatletter
+\renewcommand*\env@matrix[1][\arraystretch]{%
+  \edef\arraystretch{#1}%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols c}}
+\makeatother
+
+%-------------------------------------
+%\newcounter{sectrefs}
+%\setcounter{sectrefs}{0}
+%\setcounter{section}{0}
+%\setcounter{figure}{0}
+%\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+
+%
+%--------------------------------------
+%
+%
+%
+%              start document 
+%              ==========
+%
+%
+\begin{document}
+\LARGE
+\noindent \textbf{Periodic Boundary Conditions for RVEs}
+
+
+\small
+\noindent \textbf{Python Code (rve\_mpc\_generator.py) to Construct Constraints
+ for WARP3D and Abaqus}\\
+\noindent {(Rectangular Prism RVEs)}
+
+\vspace{0.2 in}
+\noindent Robert H. Dodds, Jr., PhD, NAE\\
+\small
+\noindent \rm{\it{rhdodds@gmail.com}}\\
+{\small{\  Updated:  \today\ at \currenttime}}
+
+\vspace{0.2 in}
+
+\section{Purpose}
+\label{app:pbc_script_logic}
+
+The script\footnote{The code was written through extensive
+interactions with ChatGPT 5.2 over multiple weeks. 
+Many design iterations were required to
+properly code the PBC theory, algorithmic details to detect/capture
+special cases, parse the input data file, format correctly output for
+WARP3D and Abaqus, and to
+develop comprehensive error checking. } generates ready-to-use, boundary-condition 
+include files for a 3D representative volume element (RVE) using periodic 
+displacement boundary conditions (PBCs), in formats compatible with WARP3D and Abaqus.
+
+The 3D mesh must define a rectangular prism, often constructed 
+using hex or tet elements. Nodes on the boundary surfaces
+must satisfy the \ti{node-pairing} requirement. Pairs 
+of nodes are located on opposite faces of the RVE whose
+in-plane coordinates are identical. They represent the same physical point in the periodic 
+material and are coupled by the periodic displacement constraints. The codes NEPER and
+GMSH have capabilities to generate meshes with node pairing.
+
+For WARP3D the generated output file has:
+\begin{itemize}
+  \item a \texttt{constraints} block (absolute, Dirichlet, displacement 
+  constraints), followed by
+  \item a \texttt{multipoint} block (multi-point constraints, MPCs).
+\end{itemize}
+For Abaqus the generated output file has:
+\begin{itemize}
+  \item an \texttt{*EQUATION} section (multi-point constraints, MPCs), followed by
+  \item a \texttt{*BOUNDARY} section (absolute displacement constraints).
+\end{itemize}
+No manual editing of the generated constraints/MPC files should be 
+required for a correctly defined periodic RVE mesh. They also contain extensive
+comment lines describing features of the generated MPCs.
+%
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.0in 5.5in 0.4in 0.0in, clip=true,scale=0.5,angle=0]{Fig_1.pdf} 
+\caption{{\small Fig. 1. (a) Labelling of vertices, edges and faces 
+for rectangular prism RVE. (b) Example periodic displacements}.
+\label{fig:macroscale}}
+%
+\end{center}
+\end{figure}
+
+
+\nid Figure 1 illustrates a rectangular prism RVE with some notation used in this
+document.
+
+The periodic loadings are specified by
+\begin{subequations}\label{EE:e}
+\begin{align}
+u_1^{j+} - u_1^{j-}
+&= \bar\varepsilon_{11}\,\Delta x_1^{\,j}
+ + \bar\varepsilon_{12}\,\Delta x_2^{\,j}
+ + \bar\varepsilon_{13}\,\Delta x_3^{\,j},\\
+u_2^{j+} - u_2^{j-}
+&= \bar\varepsilon_{21}\,\Delta x_1^{\,j}
+ + \bar\varepsilon_{22}\,\Delta x_2^{\,j}
+ + \bar\varepsilon_{23}\,\Delta x_3^{\,j},\\
+u_3^{j+} - u_3^{j-}
+&= \bar\varepsilon_{31}\,\Delta x_1^{\,j}
+ + \bar\varepsilon_{32}\,\Delta x_2^{\,j}
+ + \bar\varepsilon_{33}\,\Delta x_3^{\,j}\ .
+\end{align}
+\end{subequations}
+
+\nid where $\bar\varepsilon_{ik}$ denotes the known, average strain tensor 
+at a material point to be imposed on the RVE. This form supports algorithmic 
+enforcement of periodicity; it is not intended to assert that the 
+imposed field corresponds to a physically admissible macroscopic 
+strain in the classical sense. In this implementation, $\bar\varepsilon_{ik}$,
+is not required to be symmetric. 
+Example:  $\bar\varepsilon_{12}$ may be different than  $\bar\varepsilon_{21}$.
+Here it is a convenient framework
+to describe loadings on the RVE.
+
+Table 1 lists the symbolic MPC equations prior to elimination of 
+zero terms, absolute constraints, and dummy-node substitutions. The
+boundary surfaces have vertex nodes, edge nodes and face nodes. Edge node
+lists omit their vertex nodes; face node lists omit their edge and vertex nodes.
+
+\section{Input data required by the script}
+The input is a text file describing the RVE mesh and loading. 
+Comment lines (or inline comments) may be included using the character \texttt{\#}.
+
+\nid Required items include:
+\begin{itemize}
+\item number of nodes, excluding additional dummy-nodes required to enforce the PBCs. 
+Element data may be present but is not used by the script,
+\item declared dimensions $L_x$, $L_y$, $L_z$ of the rectangular prism 
+(used for reporting and consistency checks),
+\item node numbers for the 8 vertex nodes $A$--$H$,
+\item the imposed $3\times 3$ macroscopic strain tensor 
+$\bar{\varepsilon}_{ij}$ (row-wise input). Does not need to be symmetric,
+\item an optional list of absolute constraints (DOFs fixed to zero). Usually to prevent 
+rigid-body motion,
+\item a \texttt{DUMMY\_EPS\_MAP} block defining the dummy-node method for 
+each strain component used, and
+\item the $X,Y,Z$ coordinates of all nodes. Nodes must be numbered 
+sequentially\footnote{This is a requirement imposed by WARP3D}. 
+Coordinate values are truncated 
+at 7 significant figures after reading. The code expects the dummy-node pairs
+to be defined after all nodes of the RVE. Coordinates
+for dummy nodes are ignored when included.
+\end{itemize}
+
+\begin{landscape} 
+
+\begin{center}
+  \small
+  {%
+    \setlength{\extrarowheight}{6pt}
+   \vspace*{0.5cm}
+    %========================================
+    % TABLE BLOCK (no float)
+    %========================================
+    \begin{tabular}{|>{\centering\arraybackslash}p{0.32\textwidth}|
+                     >{\centering\arraybackslash}p{0.38\textwidth}|
+                     >{\centering\arraybackslash}p{0.36\textwidth}|}
+      \hline
+      \textbf{Face Nodes} & \textbf{Vertex Nodes} & \textbf{Edge Nodes} \\
+      \hline
+
+      % Row 1
+      $u_i^{\mathrm{FGCB}} - u_i^{\mathrm{EHDA}}
+        - L_x\,\bar\varepsilon_{i1} = 0$
+      &
+      $u_i^{\mathrm{G}} - u_i^{\mathrm{A}}
+        - L_x\,\bar\varepsilon_{i1}
+        - L_y\,\bar\varepsilon_{i2}
+        - L_z\,\bar\varepsilon_{i3} = 0$
+      &
+      \text{$\mathrm{FG} \leftrightarrow \mathrm{AD}$:}\par
+      $u_i^{\mathrm{FG}} - u_i^{\mathrm{AD}}
+        - L_x\,\bar\varepsilon_{i1}
+        - L_y\,\bar\varepsilon_{i2} = 0$
+      \\[14pt]
+      \hline
+
+      % Row 2
+      $u_i^{\mathrm{FEHG}} - u_i^{\mathrm{BADC}}
+         - L_y\,\bar\varepsilon_{i2} = 0$
+      &
+      $u_i^{\mathrm{F}} - u_i^{\mathrm{D}}
+         - L_x\,\bar\varepsilon_{i1}
+         - L_y\,\bar\varepsilon_{i2}
+         + L_z\,\bar\varepsilon_{i3} = 0$
+      &
+      \text{$\mathrm{HG} \leftrightarrow \mathrm{AB}$:}\par
+      $u_i^{\mathrm{HG}} - u_i^{\mathrm{AB}}
+         - L_y\,\bar\varepsilon_{i2}
+         - L_z\,\bar\varepsilon_{i3} = 0$
+      \\[14pt]
+      \hline
+
+      % Row 3
+      $u_i^{\mathrm{GHDC}} - u_i^{\mathrm{FEAB}}
+         - L_z\,\bar\varepsilon_{i3} = 0$
+      &
+      $u_i^{\mathrm{H}} - u_i^{\mathrm{B}}
+         + L_x\,\bar\varepsilon_{i1}
+         - L_y\,\bar\varepsilon_{i2}
+         - L_z\,\bar\varepsilon_{i3} = 0$
+      &
+      \text{$\mathrm{GC} \leftrightarrow \mathrm{EA}$:}\par
+      $u_i^{\mathrm{GC}} - u_i^{\mathrm{EA}}
+         - L_x\,\bar\varepsilon_{i1}
+         - L_z\,\bar\varepsilon_{i3} = 0$
+      \\[14pt]
+      \hline
+
+      % Row 4
+      &
+      $u_i^{\mathrm{C}} - u_i^{\mathrm{E}}
+         - L_x\,\bar\varepsilon_{i1}
+         + L_y\,\bar\varepsilon_{i2}
+         - L_z\,\bar\varepsilon_{i3} = 0$
+      &
+      \text{$\mathrm{BC} \leftrightarrow \mathrm{EH}$:}\par
+      $u_i^{\mathrm{BC}} - u_i^{\mathrm{EH}}
+         - L_x\,\bar\varepsilon_{i1}
+         + L_y\,\bar\varepsilon_{i2} = 0$
+      \\[14pt]
+      \hline
+
+      % Row 5
+      &
+      &
+      \text{$\mathrm{FE} \leftrightarrow \mathrm{CD}$:}\par
+      $u_i^{\mathrm{FE}} - u_i^{\mathrm{CD}}
+         - L_y\,\bar\varepsilon_{i2}
+         + L_z\,\bar\varepsilon_{i3} = 0$
+      \\[14pt]
+      \hline
+
+      % Row 6
+      &
+      &
+      \text{$\mathrm{FB} \leftrightarrow \mathrm{HD}$:}\par
+      $u_i^{\mathrm{FB}} - u_i^{\mathrm{HD}}
+         - L_x\,\bar\varepsilon_{i1}
+         + L_z\,\bar\varepsilon_{i3} = 0$
+      \\[14pt]
+      \hline
+
+    \end{tabular}
+
+    % Table caption (non-floating)
+    \captionof{table}{{\small Table 1. MPC equations for faces, vertices, and edges in
+    periodic boundary conditions. $i=1,2,3$}}
+    \label{tab:node_equations}
+
+    %========================================
+    % Small vertical gap before figure
+    %========================================
+    \vspace*{0.1cm}
+
+    %========================================
+    % FIGURE BLOCK (no float)
+    %========================================
+    % NOTE: In landscape coordinates this is "below" the table.
+    % When viewed in portrait, it appears "to the right" of the table.
+    \includegraphics[trim=0.0in 6.0in 3.4in 0.0in, clip=true,scale=0.6,angle=0]{Fig_1.pdf}
+
+    % (Caption omitted per your preference; you could add \captionof{figure} here if desired.)
+
+  }% end group with extrarowheight
+\end{center}
+
+\end{landscape}
+
+
+\section{Origin-independence via automatic detection of RVE bounds}
+The script does \emph{not} require that the RVE occupy 
+$x\in[0,L_x]$, $y\in[0,L_y]$, $z\in[0,L_z]$.
+Instead, the script detects the geometric bounds directly from the node coordinates:
+\begin{align}
+x_{\min} &= \min(x), & x_{\max} &= \max(x), \\
+y_{\min} &= \min(y), & y_{\max} &= \max(y), \\
+z_{\min} &= \min(z), & z_{\max} &= \max(z),
+\end{align}
+and computes the detected dimensions:
+\begin{align}
+L_x^{\mathrm{det}} &= x_{\max}-x_{\min}, &
+L_y^{\mathrm{det}} &= y_{\max}-y_{\min}, &
+L_z^{\mathrm{det}} &= z_{\max}-z_{\min}.
+\end{align}
+The script reports both the declared dimensions $(L_x,L_y,L_z)$ and the detected dimensions
+$(L_x^{\mathrm{det}},L_y^{\mathrm{det}},L_z^{\mathrm{det}})$ and issues 
+a warning if they differ beyond tolerance.
+
+
+\section{Boundary node classification}
+
+Each RVE node is classified according to how many boundary planes it lies on:
+\begin{itemize}
+\item \ul{vertex node}: on the intersection of three boundary planes. 
+The 8 nodes are labelled $A$--$H$.
+\item \ul{edge node}: on the intersection of two boundary planes, excluding vertex nodes
+\item \ul{face node}: on exactly one boundary plane, excluding vertex and edge nodes
+\item \ul{interior node}: on no boundary plane,
+\end{itemize}
+Boundary planes are detected using the automatically determined bounds:
+\begin{itemize}
+\item $X^{-}$ plane at $x=x_{\min}$, \quad $X^{+}$ plane at $x=x_{\max}$,
+\item $Y^{-}$ plane at $y=y_{\min}$, \quad $Y^{+}$ plane at $y=y_{\max}$,
+\item $Z^{-}$ plane at $z=z_{\min}$, \quad $Z^{+}$ plane at $z=z_{\max}$.
+\end{itemize}
+A coordinate tolerance (relative to the largest RVE dimension) 
+is used when assigning nodes to planes.
+
+\section{Construction of periodic node pairings}
+The script performs extensive error checking to confirm the
+boundary nodes satisfy the geometric, node-pairing requirements.
+\subsection{Face-node pairings}
+Nodes on opposite faces are paired by matching the two transverse coordinates (within tolerance):
+\begin{itemize}
+\item $X^{-}\leftrightarrow X^{+}$: match $(y,z)$,
+\item $Y^{-}\leftrightarrow Y^{+}$: match $(x,z)$,
+\item $Z^{-}\leftrightarrow Z^{+}$: match $(x,y)$.
+\end{itemize}
+For each paired node $(\,-,+\,)$, the script computes the geometric offset vector
+\begin{equation}
+\Delta \mathbf{x} = \mathbf{x}^{+}-\mathbf{x}^{-},
+\end{equation}
+which is translation-invariant and therefore independent of the global origin.
+
+
+
+\subsection{Edge-node pairings}
+
+Edge nodes are identified by the set of two boundary planes they lie on, \eg\ $\{X^{-},Y^{-}\}$.
+Each family of opposite edges is paired using the remaining ``free'' coordinate as the edge parameter:
+\begin{itemize}
+\item $\{X^{-},Y^{-}\}\leftrightarrow\{X^{+},Y^{+}\}$, parameter axis $z$,
+\item $\{X^{-},Y^{+}\}\leftrightarrow\{X^{+},Y^{-}\}$, parameter axis $z$,
+\item $\{X^{-},Z^{-}\}\leftrightarrow\{X^{+},Z^{+}\}$, parameter axis $y$,
+\item $\{X^{-},Z^{+}\}\leftrightarrow\{X^{+},Z^{-}\}$, parameter axis $y$,
+\item $\{Y^{-},Z^{-}\}\leftrightarrow\{Y^{+},Z^{+}\}$, parameter axis $x$,
+\item $\{Y^{-},Z^{+}\}\leftrightarrow\{Y^{+},Z^{-}\}$, parameter axis $x$.
+\end{itemize}
+For each edge-node pair, $\Delta\mathbf{x}$ is computed from
+coordinates (same as for face nodes).
+
+\subsection{Vertex-node pairings}
+The user supplies the node numbers for the eight vertices $A$--$H$.
+The script forms the four body-diagonal vertex pairings and computes
+$\Delta\mathbf{x}$ directly from the vertex coordinates; the origin 
+location does not matter.
+
+
+\section{Dummy node method }
+WARP3D supports only homogeneous, multi-point equations (MPCs), \eg
+\begin{equation}
+\hv{27\ 1.0\ w\ -\ 20\ 1.0\ w\ - 49\ 3.5\ w = 0}
+\end{equation}
+To make an equivalent, non-homogenous equation required to impose the non-zero terms of 
+$\bar \varepsilon_{ij}$, WARP3D uses the so-called dummy-node and rigid-link
+element method. The non-homogeneous terms 
+are shifted to displacements applied at auxiliary (dummy) nodes, so that all MPCs 
+become homogeneous. This greatly simplifies assembly of the equations and is compatible 
+with the existing WARP3D constraint infrastructure. 
+
+The pairs of dummy nodes without the link element are adopted to generate PBCs for Abaqus. 
+
+%
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.0in 6.0in 1.0in 0.0in, clip=true,scale=0.6,angle=0]{Fig_2.pdf} 
+\caption{{\small Fig. 2. Example demonstrating use of dummy nodes and rigid-link element
+to enable definition of homogeneous multi-point constraints. Local nodes 1, 2 of the
+link element are often coincident.}
+\label{fig:macroscale}}
+%
+\end{center} 
+\end{figure}
+Figure 2 shows the setup for a simplified application of the dummy node-rigid link element
+method. The $\hv{link2}$ element is connected to \rm{\it{{dummy}}} nodes 49 and 50. For
+convenience these nodes are often defined well outside the RVE -- their actual (global)
+position is immaterial. Spring stiffness
+values for the element in global $(x,y,z)$ directions are set to a sufficiently large value.
+Absolute constraints are imposed on node 50, \eg
+\begin{equation}
+\hv{50\ \ u\ = 0\  \ v  = 0\  \ w = 0.0025}
+\end{equation}
+Given the large spring stiffnesses for the link element, node 49 will have the same
+displacements as node 50. Node 49 thus has the same $\hv{w}$ displacement
+as node 50, while maintaining the required homogeneous form.
+
+Most often, 6 link elements and corresponding dummy-node pairs are used when all 
+terms of $\bar \varepsilon_{ij}$ are non-zero.
+
+\subsection{\texttt{DUMMY\_EPS\_MAP} definition}
+The input file includes a \texttt{DUMMY\_EPS\_MAP} block with entries of the form:
+\begin{center}
+\texttt{i j dummy\_node driver\_node dof}
+\end{center}
+Interpretation of a map entry $(i,j)$:
+\begin{itemize}
+\item $(i,j)$ is the entry of the $\bar \varepsilon_{ij}$.
+\item $\hv {dummy\_node}$ appears in the homogeneous MPC equation. Example: 
+node 49 in Fig. 2.
+\item $\hv{driver\_node}$ receives an absolute displacement constraint
+on the indicated $\hv{dof}$  whose value equals $\bar{\varepsilon}_{ij}$.
+Example: node 50 in Fig. 2.
+\end{itemize}
+The user connects $\hv{driver\_node}$ and $\hv{dummy\_node}$ using stiff link elements in the WARP3D model,
+so that the imposed driver displacement is transmitted to the dummy DOF used in the MPCs.
+
+In the Abaqus model, additional MPCs connect 
+the $\hv {dummy\_node}$ and  $\hv{driver\_node}$.
+
+
+\subsection{Resulting MPC structure}
+For a generic paired-node relation, the script generates a WARP3D MPC equation of the form
+\begin{equation}
+u_i^{+}-u_i^{-} \;-\; \Delta x_1\,d_{i1} \;-\; \Delta x_2\,d_{i2} \;-\; \Delta x_3\,d_{i3} \;=\; 0,
+\end{equation}
+where $d_{ij}$ denotes the dummy-node DOF representing $\bar{\varepsilon}_{ij}$.
+Terms are automatically omitted when:
+\begin{itemize}
+\item $\bar{\varepsilon}_{ij}=0$,
+\item $\Delta x_j=0$, or
+\item the referenced DOF is already fixed by an absolute constraint.
+\end{itemize}
+
+\subsection{Absolute constraints and closure iteration}
+\subsubsection{Absolute constraints emitted by the script}
+Absolute constraints are emitted under the WARP3D keyword \texttt{constraints}.
+The script writes two classes of absolute constraints:
+\begin{itemize}
+\item User-specified zero constraints from the \texttt{ABS\_CONSTRAINTS} section of the input file.
+\item Driver constraints implied by the strain tensor and the \texttt{DUMMY\_EPS\_MAP}:
+\begin{equation}
+u(\text{driver\_node},\text{dof}) = \bar{\varepsilon}_{ij}
+\end{equation}
+for each nonzero $\bar{\varepsilon}_{ij}$ present in the map.
+\end{itemize}
+A consistency check is performed: a dof cannot be both fixed to zero 
+and assigned a nonzero driver value.
+
+\subsubsection{Implied constraints and two-pass closure}
+When some strain components in $\bar{\varepsilon}_{ij}$ are zero 
+and/or absolute constraints are 
+applied, some MPC equations become unnecessary.
+If an MPC equation collapses to a single remaining, \emph{physical} 
+term, \eg $63\,u=0$, then
+it becomes an implied absolute constraint rather than an MPC.
+To detect these situations, the script performs an iterative,
+closure operation:
+\begin{itemize}
+\item generate MPCs under the current set of absolute constraints,
+\item collect any implied absolute constraints,
+\item add them to the absolute constraint set,
+\item repeat until no new implied constraints are found,
+thereby ensuring that all constraints are output in valid WARP3D order 
+and that no incomplete MPCs remain.
+\item the same closure process is performed to generate MPCs for Abaqus
+\end{itemize}
+
+\subsection{Output file structure and WARP3D ordering}
+The output file generated by the script begins with a comment header describing:
+\begin{itemize}
+\item input file name,
+\item detected bounds and dimensions,
+\item declared vs.\ detected dimension comparison,
+\item the imposed strain tensor,
+\item the \texttt{DUMMY\_EPS\_MAP} summary, and
+\item any warnings.
+\end{itemize}
+The output then contains:
+\begin{itemize}
+\item a \texttt{constraints} block (absolute constraints), followed by
+\item a \texttt{multipoint} block (MPC equations).
+\end{itemize}
+This ordering matches the WARP3D requirement that absolute constraints appear before MPC definitions.
+
+
+\section{PBC Implementation for Abaqus}
+A number of methods are available in Abaqus to impose the PBCs on rectangular RVEs.
+For consistency with the WARP3D formulation, this implementation retains 
+the dummy-node pairs (Section 6, Fig. 2). However, Abaqus does not 
+require rigid-link elements between the nodes; 
+Abaqus permits nodes that are not connected to elements.
+
+Rather than stiff, orthogonal springs connecting the two nodes of each node pair,
+3 additional MPCs are defined in Abaqus to make the $u, v, w$ displacements 
+equal at each pair of dummy nodes, \eg nodes 49, 50 in Fig. 2. These
+three *EQUATION constraints enforce $u_{49}=u_{50}$, $v_{49}=v_{50}$, 
+and $w_{49}=w_{50}$:
+\small
+\begin{verbatim}
+   *EQUATION
+   2
+   49, 1, 1.0
+   50, 1, -1.0
+   *EQUATION
+   2
+   49, 2, 1.0
+   50, 2, -1.0
+   *EQUATION
+   2
+   49, 3, 1.0
+   50, 3, -1.0
+\end{verbatim}
+\normalsize
+\nid The MPCs to define periodic conditions for vertex, edge and face nodes
+are then defined with input of the form
+\small
+\begin{verbatim}
+   ** --- EDGE MPCs (type X-Z (-+)/(+-)) ---
+   *EQUATION
+   4
+   6, 1, 1.0
+   22, 1, -1.0
+   28, 1, -1.0
+   32, 1, 4.0
+   *EQUATION
+   4
+   6, 2, 1.0
+   22, 2, -1.0
+   30, 2, -1.0
+   34, 2, 4.0
+    ...
+    ...
+\end{verbatim}
+\normalsize
+\nid The absolute constraints imposed on the dummy nodes to 
+load the model, \eg node 50 in Fig. 2, are defined with *BOUNDARY. 
+\small
+\begin{verbatim}
+   *BOUNDARY
+   50, 1, 1, 0.1
+   50, 2, 2, 0.2
+    ....
+    ....
+   1, 1, 1, 0.0
+   1, 2, 2, 0.0     ** Node 1 constraints, for example, to prevent rigid motion
+   1, 3, 3, 0.0
+\end{verbatim}
+\normalsize
+
+\nid All the MPCs are defined using *EQUATION commands (which must precede the *BOUNDARY in Abaqus .inp files).
+
+\subsection{Output file structure and Abaqus ordering}
+The output file generated by the script begins with a comment header describing:
+\begin{itemize}
+\item input file name,
+\item detected bounds and dimensions,
+\item declared vs.\ detected dimension comparison,
+\item the imposed strain tensor,
+\item the \texttt{DUMMY\_EPS\_MAP} summary, and
+\item any warnings.
+\end{itemize}
+The output then contains:
+\begin{itemize}
+\item a *EQUATION for each multi-point constraint, followed by
+\item a *BOUNDARY to define absolute constraints that suppress
+rigid motion to impose non-zero displacements from $\bar{\varepsilon}_{ij}$
+\end{itemize}
+This ordering matches the Abaqus requirement that MPCs are part of the model
+definition and absolute constraints are part of the loading.
+
+\section{Robustness and large meshes}
+
+Node-pairing is performed in the script using simple coordinate-key 
+hashing (rounded transverse coordinates),
+which is efficient for large boundary node sets.
+The total number of MPC equations scales with the number of paired boundary 
+nodes and three displacement components.
+
+The script has been exercised on large RVEs ($10^5$ nodes) and produces
+tens of thousands of MPC equations with no manual editing required in typical workflows.
+
+Execution time for the Python script is a few seconds for large models.
+
+\section{Example Problem}
+\nid This example demonstrates the concepts described here and develops
+ an input file for the Python program
+$\hv{rve\_mpc\_generator.py}$. See Fig. 3 for the setup. 
+The analysis is linear-elastic for simplicity. Extension for nonlinear behavior does not alter
+the constraints generated by the program.
+%
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.50in 2.8in 0.4in 0.0in, clip=true,scale=0.7,angle=0]{Fig_3.pdf} 
+\caption{{\small Fig. 3. Small example problem to illustrate setup and 
+use of the $\hv{rve\_mpc\_generator.py}$ Python program.} 
+\label{fig:macroscale}}
+%
+\end{center} 
+\end{figure}
+
+The model has 8 solid elements (8-node isoparametrics); 
+4 link elements (no link elements for Abaqus);
+27 nodes for the prism; 4 dummy-node pairs (8 total nodes);
+and a linear-elastic material.
+
+Figure 4 lists the node coordinates and element connectivities.
+
+The prism dimensions are $L_x=1, L_y=2, L_z=4$ to emphasize
+that imposed strains are multiplied by these sizes to obtain
+corresponding imposed displacements. The macroscale strain tensor is
+
+\begin{equation}
+\bar{\boldsymbol{\varepsilon}} =
+\begin{bmatrix}
+\bar{\varepsilon}_{11} & \bar{\varepsilon}_{12} & \bar{\varepsilon}_{13} \\
+\bar{\varepsilon}_{21} & \bar{\varepsilon}_{22} & \bar{\varepsilon}_{23} \\
+\bar{\varepsilon}_{31} & \bar{\varepsilon}_{32} & \bar{\varepsilon}_{33}
+\end{bmatrix}
+=
+\begin{bmatrix}
+0.1 & 0.2 & 0.5 \\
+0.2 & 0.0 & 0.3 \\
+0.5 & 0.3 & 0.0
+\end{bmatrix}
+\end{equation}
+
+\nid where values are chosen for convenience to make obvious the results are correct. 
+
+One dummy-node pair and link element for each non-zero strain component are defined
+(here the macroscale shear strains are symmetric).
+The (2,2) and (3,3) strain 
+values could be non-zero with addition of 2 
+more link elements and 2 more dummy-node pairs.
+
+Coordinates for dummy nodes 28-35 are set at 10.0 10.0 10.0. The values are 
+immaterial and do not affect the solution.
+Link element stiffnesses are set at $10^{10}$ -- preliminary analyses showed this value is
+sufficient to make displacements at both nodes of link elements identical.
+%
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.0in 3.3in 0.60in 0.0in, clip=true,scale=0.7,angle=0]{Fig_4.pdf} 
+\caption{{\small Fig. 4. Coordinates and incidences for the mesh. For Abaqus, omit the
+Link2 elements. Put this data into a file named $\hv{coords\_incid.inp}$} for WARP3D
+input.}
+%
+\end{center} 
+\end{figure}  
+
+The complete WARP3D input file is shown in Fig. 5.  Figure 5a shows the included file of
+constraints data.
+
+The complete Abaqus input file is shown in Fig. 8. The input can be simplified
+with *INCLUDE commands for models with many thousands of nodes, elements
+*EQUATIONs, etc.
+
+\subsection{User generation of constraints}
+\nid For this simple problem, it is feasible to generate the absolute and
+MPC constraints manually. The next section uses the Python script.
+
+\nid Recommended steps:
+\begin{itemize}
+\item Decide upon absolute constraints to prevent 3 rigid-body 
+translations and 3 rotations (rigid-body constraints).
+For the loading in Eq. (11), only node 1 needs to be constrained ($u=v=w=0$).
+The non-zero imposed displacements (from 
+strains $\bar\varepsilon_{ij}$)
+are sufficient to prevent the three rigid-rotations.
+
+\item Start with all equations in Table 1. Eliminate all the zero terms 
+from the zero imposed $\bar\varepsilon_{ij}$ values and constraints to remove
+rigid-body motions.
+
+\item Some of the MPCs to enforce the periodic boundary 
+conditions may then have only 1 term remaining. The MPC has become 
+an absolute constraint and must be included with them in the constraints.
+In WARP3D input, absolute constraints may not be intermixed with MPCs.
+
+In Abaqus, MPCs are part of the model definition (*EQUATION); the absolute
+constraints are part of the modeling loading (*BOUNDARY).
+\end{itemize}
+
+\nid The imposed displacements for dummy-node loading become:
+
+\begin{equation}
+\begin{aligned}
+\hv{Node\ 29:} &\quad u = 0.1,\ v = 0.0,\ w = 0.0\ \leftarrow \bar\epsilon_{11} \\
+\hv{Node\ 31:} &\quad u = 0.2,\ v = 0.2,\ w = 0.0\ \leftarrow \bar\epsilon_{12}=\bar\epsilon_{21}\\
+\hv{Node\ 33:} &\quad u = 0.5,\ v = 0.0,\ w = 0.5\ \leftarrow \bar\epsilon_{13}=\bar\epsilon_{31}\\ 
+\hv{Node\ 35:} &\quad u = 0.0,\ v = 0.3,\ w = 0.3\ \leftarrow \bar\epsilon_{23}=\bar\epsilon_{32}
+\end{aligned}
+\end{equation} 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.0in 2.8in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_5.pdf} 
+\caption{{\small Fig. 5. WARP3D input file for the example problem.}}
+\end{center} 
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[trim=0.0in 2.8in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_5a.pdf} 
+\caption{{\small Fig. 5a. Manually prepared constraints input file.}}
+\end{center} 
+\end{figure}
+
+
+\subsection{Constraints using $\hv{rve\_mpc\_generator.py}$}
+
+\nid Figure 6 shows the input file prepared to generate all constraints
+for the example problem. The required input for a very much larger
+model differs only in the nodal coordinates data.
+
+At execution, the script requests the input file name, the file names for
+generated constraints data (WARP3D, Abaqus, or both) and whether 
+or not the symbolic form of all
+the MPC equations should be printed as comment lines in the constraints
+data file -- useful for understanding the conversion of all MPCs in
+Table 1 for the model. 
+
+Figure 7 shows the generated constraints file in form for direct
+input to WARP3D. 
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.3in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_6.pdf} 
+\caption{{\small Fig. 6. Input file for the $\hv{rve\_mpc\_generator.py}$ Python program }}
+\end{center} 
+\end{figure}
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 1.6in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_7.pdf} 
+\caption{{\small Fig. 7. Output file of WARP3D constraints data generated by the script.}}
+\end{center} 
+\end{figure}
+
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.5in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_8_p1.pdf} 
+\caption{{\small Fig. 8. Complete input file for Abaqus solution of the example
+problem. See continuing pages.}}
+\end{center} 
+\end{figure}
+
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.0in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_8_p2.pdf} 
+\caption{{\small Fig. 8 (cont'd). Complete input file for Abaqus solution of the example
+problem. See continuing pages.}}
+\end{center} 
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.0in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_8_p3.pdf} 
+\caption{{\small Fig. 8 (cont'd). Complete input file for Abaqus solution of the example
+problem. See continuing pages.}}
+\end{center} 
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.0in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_8_p4.pdf} 
+\caption{{\small Fig. 8 (cont'd). Complete input file for Abaqus solution of the example
+problem. See continuing pages.}}
+\end{center} 
+\end{figure}
+
+
+
+\begin{figure}[h]
+\begin{center} 
+\includegraphics[trim=0.0in 0.0in 1.0in 0.0in, clip=true,scale=0.7,angle=0]{Fig_8_p5.pdf}  
+\caption{{\small Fig. 8 (cont'd). Complete input file for Abaqus solution of the example
+problem. This is last page of figure.}}
+\end{center} 
+\end{figure}
+
+
+\end{document}
+

@@ -1,0 +1,94 @@
+! ------------------------------------------------------------
+! RVE PBC generator output (origin-agnostic bounds)
+! Input file : test_90a_rve_input.inp
+!
+! Declared dimensions from input file:
+!   Lx_decl=1.0  Ly_decl=2.0  Lz_decl=4.0
+!
+! Detected bounds from node coordinates:
+!   xmin=0.0  xmax=1.0   => Lx_det=1.0
+!   ymin=0.0  ymax=2.0   => Ly_det=2.0
+!   zmin=0.0  zmax=4.0   => Lz_det=4.0
+!
+! OK: Declared (Lx,Ly,Lz) consistent with detected bounds (within tolerance).
+!
+! Vertex nodes: {'A': 1, 'B': 3, 'C': 21, 'D': 19, 'E': 7, 'F': 9, 'G': 27, 'H': 25}
+!
+! Enforced strain tensor eps_ij (row-wise):
+!   row 1: 0.1  0.2  0.5
+!   row 2: 0.2  0.0  0.3
+!   row 3: 0.5  0.3  0.0
+!
+! Dummy strain mapping (eps_ij -> dummy_node, driver_node, dof):
+!   eps_11 -> dummy 28 u,  driver 29 u
+!   eps_12 -> dummy 30 u,  driver 31 u
+!   eps_13 -> dummy 32 u,  driver 33 u
+!   eps_21 -> dummy 30 v,  driver 31 v
+!   eps_23 -> dummy 34 v,  driver 35 v
+!   eps_31 -> dummy 32 w,  driver 33 w
+!   eps_32 -> dummy 34 w,  driver 35 w
+!
+! --- ABSOLUTE CONSTRAINTS (must appear before 'multipoint') ---
+constraints
+  29 u 0.1
+  31 u 0.2
+  31 v 0.2
+  33 u 0.5
+  33 w 0.5
+  35 v 0.3
+  35 w 0.3
+  1 u 0.0
+  1 v 0.0
+  1 w 0.0
+!
+!
+!		.... Full ready-to-use periodic RVE boundary conditions .....
+!		          in WARP3D required format
+!
+!
+! --- MULTI-POINT CONSTRAINTS (MPCs) ---
+multipoint
+  15 1.0 u  - 13 1.0 u  - 28 1.0 u = 0.
+  15 1.0 v  - 13 1.0 v  - 30 1.0 v = 0.
+  15 1.0 w  - 13 1.0 w  - 32 1.0 w = 0.
+  17 1.0 u  - 11 1.0 u  - 30 2.0 u = 0.
+  17 1.0 v  - 11 1.0 v = 0.
+  17 1.0 w  - 11 1.0 w  - 34 2.0 w = 0.
+  23 1.0 u  - 5 1.0 u  - 32 4.0 u = 0.
+  23 1.0 v  - 5 1.0 v  - 34 4.0 v = 0.
+  23 1.0 w  - 5 1.0 w = 0.
+  18 1.0 u  - 10 1.0 u  - 28 1.0 u  - 30 2.0 u = 0.
+  18 1.0 v  - 10 1.0 v  - 30 1.0 v = 0.
+  18 1.0 w  - 10 1.0 w  - 32 1.0 w  - 34 2.0 w = 0.
+  12 1.0 u  - 16 1.0 u  - 28 1.0 u  + 30 2.0 u = 0.
+  12 1.0 v  - 16 1.0 v  - 30 1.0 v = 0.
+  12 1.0 w  - 16 1.0 w  - 32 1.0 w  + 34 2.0 w = 0.
+  24 1.0 u  - 4 1.0 u  - 28 1.0 u  - 32 4.0 u = 0.
+  24 1.0 v  - 4 1.0 v  - 30 1.0 v  - 34 4.0 v = 0.
+  24 1.0 w  - 4 1.0 w  - 32 1.0 w = 0.
+  6 1.0 u  - 22 1.0 u  - 28 1.0 u  + 32 4.0 u = 0.
+  6 1.0 v  - 22 1.0 v  - 30 1.0 v  + 34 4.0 v = 0.
+  6 1.0 w  - 22 1.0 w  - 32 1.0 w = 0.
+  26 1.0 u  - 2 1.0 u  - 30 2.0 u  - 32 4.0 u = 0.
+  26 1.0 v  - 2 1.0 v  - 34 4.0 v = 0.
+  26 1.0 w  - 2 1.0 w  - 34 2.0 w = 0.
+  8 1.0 u  - 20 1.0 u  - 30 2.0 u  + 32 4.0 u = 0.
+  8 1.0 v  - 20 1.0 v  + 34 4.0 v = 0.
+  8 1.0 w  - 20 1.0 w  - 34 2.0 w = 0.
+  27 1.0 u  - 28 1.0 u  - 30 2.0 u  - 32 4.0 u = 0.
+  27 1.0 v  - 30 1.0 v  - 34 4.0 v = 0.
+  27 1.0 w  - 32 1.0 w  - 34 2.0 w = 0.
+  9 1.0 u  - 19 1.0 u  - 28 1.0 u  - 30 2.0 u  + 32 4.0 u = 0.
+  9 1.0 v  - 19 1.0 v  - 30 1.0 v  + 34 4.0 v = 0.
+  9 1.0 w  - 19 1.0 w  - 32 1.0 w  - 34 2.0 w = 0.
+  25 1.0 u  - 3 1.0 u  + 28 1.0 u  - 30 2.0 u  - 32 4.0 u = 0.
+  25 1.0 v  - 3 1.0 v  + 30 1.0 v  - 34 4.0 v = 0.
+  25 1.0 w  - 3 1.0 w  + 32 1.0 w  - 34 2.0 w = 0.
+  21 1.0 u  - 7 1.0 u  - 28 1.0 u  + 30 2.0 u  - 32 4.0 u = 0.
+  21 1.0 v  - 7 1.0 v  - 30 1.0 v  - 34 4.0 v = 0.
+  21 1.0 w  - 7 1.0 w  - 32 1.0 w  + 34 2.0 w = 0.
+!
+! Total zero absolute constraints (final, incl. implied): 3
+! Total driver constraints (from eps_ij): 7
+! Total MPC equations emitted: 39
+! ------------------------------------------------------------
