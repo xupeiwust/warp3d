@@ -125,6 +125,7 @@ def run_all():
  test_generic( "test88" )
  test_generic( "test89" )
  test_generic( "test90" )
+ test_generic( "test91" )
 #
  time_end = time.time()
  print("  ... Elaspsed walltime: %0.1f" % (time_end-time_start))
@@ -678,9 +679,9 @@ def display_menu():
   m.append( "Test 88: (SMCS ductile growth. mesh regularization)" )
   m.append( "Test 89: (SMCS ductile growth. C(T), blunt with hole)" )
   m.append( "Test 90: (RVEs with periodic boundary conditions)" )
+  m.append( "Test 91: (Crystal plasticity for Ti6242)" )
   m.append( "Quit" )
 #
-
   print("> Select a problem to run:\n")
   if menu_displayed == False :
     for number, entry in enumerate( m ):
@@ -828,6 +829,7 @@ def main():
    if choice == 36: test_generic( "test88" )
    if choice == 37: test_generic( "test89" )
    if choice == 38: test_generic( "test90" )
+   if choice == 39: test_generic( "test91" )
 #
 # ----------------------------------------------------------------------------
 #
