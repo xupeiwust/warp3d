@@ -1,0 +1,80 @@
+**
+**
+**      Complete input for large verification problem
+**
+**
+*HEADING
+**PREPRINT,HISTORY=NO,ECHO=no,MODEL=NO,CONTACT=NO
+*NODE, SYSTEM=R, NSET=NALL
+*INCLUDE, INPUT=abaqus_coords.inp
+**
+**
+*ELEMENT,TYPE=C3D20R,ELSET=eall
+*INCLUDE, INPUT=abaqus_incid.inp
+*ELSET, ELSET=ESUB, GENERATE
+1, 10, 1
+ **
+*SOLID SECTION,ELSET=EALL,MATERIAL=steel
+*MATERIAL,NAME=steel
+*elastic
+30000., 0.30
+**
+*INCLUDE, INPUT=mpcs.inp
+**
+******************Start Step 1 -----------------------------------
+*STEP,AMPLITUDE=RAMP,INC=1
+Step 1
+*STATIC
+1,1
+** ------------------------------------------------------------
+** RVE PBC generator output (Abaqus format)
+** Input file : rve_input_eps12.inp
+**
+** Declared dimensions from input file:
+**   Lx_decl=1.6  Ly_decl=2.0  Lz_decl=0.4
+**
+** Detected bounds from node coordinates:
+**   xmin=-0.600000024  xmax=1.0   => Lx_det=1.600000024
+**   ymin=-1.0  ymax=1.0   => Ly_det=2.0
+**   zmin=0.0  zmax=0.400000006   => Lz_det=0.400000006
+**
+** Vertex nodes: {'A': 20781, 'B': 7, 'C': 89307, 'D': 101186, 'E': 37429, 'F': 1407, 'G': 90107, 'H': 110713}
+**
+** Enforced strain tensor eps_ij (row-wise):
+**   row 1: 0.0  1.0  0.0
+**   row 2: 1.0  0.0  0.0
+**   row 3: 0.0  0.0  0.0
+**
+** Dummy strain mapping (eps_ij -> dummy_node, driver_node, dof):
+**   eps_11 -> dummy 113132 u,  driver 113133 u
+**   eps_12 -> dummy 113138 u,  driver 113139 u
+**   eps_13 -> dummy 113140 u,  driver 113141 u
+**   eps_21 -> dummy 113138 v,  driver 113139 v
+**   eps_22 -> dummy 113134 v,  driver 113135 v
+**   eps_23 -> dummy 113142 v,  driver 113143 v
+**   eps_31 -> dummy 113140 w,  driver 113141 w
+**   eps_32 -> dummy 113142 w,  driver 113143 w
+**   eps_33 -> dummy 113136 w,  driver 113137 w
+**
+** --- BOUNDARY (absolute constraints) ---
+**
+*BOUNDARY
+113139, 1, 1, 1.0
+113139, 2, 2, 1.0
+20781, 1, 1, 0.0
+20781, 2, 2, 0.0
+20781, 3, 3, 0.0
+90107, 3, 3, 0.0
+101186, 1, 1, 0.0
+101186, 2, 2, 0.0
+**
+** Total zero absolute constraints (final, incl. implied): 6
+** Total driver constraints (from eps_ij): 2
+** Total MPC equations emitted: 54389
+**
+**
+*node print,freq=1,nset=nall
+u,
+*el print,freq=1,elset=esub
+s
+*END STEP
