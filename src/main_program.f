@@ -79,9 +79,8 @@ c
 
       build_sys = 1  ! Intel Fortran
 #ifdef gfortran
-      build_sys = 0
+      build_sys = 0  ! gfortran
 #endif
-
 c
       os_ok = windows_os .or. linux_os .or. osx_os
       if( .not. os_ok ) then

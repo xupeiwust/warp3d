@@ -59,7 +59,7 @@ c
       auto_blking  = .false.                                                    
       display      = .false.                                                    
 c                                                                               
-      if( endcrd(dumr) ) then ! only word blocking on command                   
+      if( endcrd(dum) ) then ! only word blocking on command                   
          call inelbk_user                                                       
       else                                                                      
          call inelbk_automatic ! probably automatic blocking            
@@ -217,7 +217,7 @@ c
 c                                                                               
       if( matchs('display',4) ) then                                            
         display = .true.                                                        
-      elseif( endcrd() ) then                                                   
+      elseif( endcrd(dum) ) then                                                   
         call splunj                                                             
       else ! unknown keyword                                                    
         call entits( item, nc )                                                 

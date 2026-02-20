@@ -86,7 +86,7 @@ c
       if( matchs_exact('use') )        go to 2500
       if( matchs('distortion',6) ) then
         call reset
-        if( true() ) call splunj
+        if( true(dum) ) call splunj
         go to 2500
       end if
       if( matchs_exact('gurson') )     go to 2600
@@ -1221,7 +1221,7 @@ c
 c
       use_distortion_metric = .true.
       call allocate_damage( 15 )
-      if( endcrd() ) go to 10  
+      if( endcrd(dum) ) go to 10  
 c
       if( matchs_exact('display') ) write(out,9060) 
      &     use_distortion_metric, Oddy_print_initial, 
@@ -1257,7 +1257,7 @@ c
      &     Oddy_critical_ratio, distortion_plastic_limit 
 
 c
-      if( endcrd() ) go to 10
+      if( endcrd(dum) ) go to 10
       if( .not. matchs_exact('Oddy') ) then
          call incrack_errmsg( 75 )
          use_distortion_metric = .false.
@@ -1281,7 +1281,7 @@ c
      &     use_distortion_metric, Oddy_print_initial, 
      &     Oddy_critical_ratio, distortion_plastic_limit 
 c
-      if( endcrd() ) go to 10
+      if( endcrd(dum) ) go to 10
 c
       if( .not. matchs_exact('plastic') ) then
          call incrack_errmsg( 70 )
@@ -3777,7 +3777,8 @@ c
      & ' MPI execution',
      & /14x,'No solution allowed.',/)                  
 c     
- 9066 format(/1x,'>>>>> error: distortion metric not yet supported with',            
+ 9066 format(/1x,'>>>>> error: distortion metric not yet ',
+     & 'supported with',            
      & ' MPI execution',
      & /14x,'No solution allowed.',/)     
 c                                                                               

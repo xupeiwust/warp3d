@@ -1742,14 +1742,14 @@ c
             found_mpc = .true.
          elseif( matchs('-',1) ) then
             found_mpc = .true.
-         elseif( integr(idummy) ) then
+         elseif( integr(dumi) ) then
             found_mpc = .true.
          else
             found_mpc = .false.
          end if
 c
          call reset
-         if( true(idummy) )  call splunj
+         if( true(dumi) )  call splunj
          if( .not. found_mpc ) return
 c
 c              loop across line to extract each node number, its

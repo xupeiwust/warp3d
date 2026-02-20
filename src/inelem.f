@@ -4,7 +4,7 @@ c     *                      subroutine inelem                       *
 c     *                                                              *
 c     *                       written by : bh                        *
 c     *                                                              *
-c     *                   last modified : 12/27/2024 rhd             *
+c     *                   last modified : 2/14/2026 rhd              *
 c     *                                                              *
 c     *     this subroutine supervises and conducts the input of     *
 c     *     element type and properties.                             *
@@ -18,31 +18,31 @@ c
       use global_data ! old common.main
       use allocated_integer_list
       use main_data, only: matprp, imatprp,
-     & id_node,   ! 4hNODE,
-     & id_curr,   ! 4hCURR,
-     & id_cent,   ! 4hCENT,
-     & id_defa,   ! 4hDEFA,
-     & id_true,   ! 4hTRUE,
-     & id_flse,   ! 4hFLSE
-     & id_o222,   ! 4hO222,
-     & id_o14p,   ! 4hO14P,
-     & id_o09p,   ! 4hO09P,
-     & id_shrt,   ! 4hSHRT,
-     & id_long,   ! 4hLONG
-     & id_o06p,   ! 4hO06P,
-     & id_o01p,   ! 4hO01P,
-     & id_o03p,   ! 4hO03P,
-     & id_o04p,   ! 4hO04P,
-     & id_o05p,   ! 4hO05P,
-     & id_o060,   ! 4hO06P,
-     & id_o07p,   ! 4hO07p,
-     & id_o111,   ! 4hO111,
-     & id_o333,   ! 4hO333,
-     & id_o3mp,   ! 4hO3MP,
-     & id_o22n,   ! 4hO22N,
-     & id_o22g,   ! 4hO22G,
-     & id_pcm,     ! 4hpcm,
-     & id_gaus   
+     & id_node,   ! NODE,
+     & id_curr,   ! CURR,
+     & id_cent,   ! CENT,
+     & id_defa,   ! DEFA,
+     & id_true,   ! TRUE,
+     & id_flse,   ! FLSE
+     & id_o222,   ! O222,
+     & id_o14p,   ! O14P,
+     & id_o09p,   ! O09P,
+     & id_shrt,   ! SHRT,
+     & id_long,   ! LONG
+     & id_o06p,   ! O06P,
+     & id_o01p,   ! O01P,
+     & id_o03p,   ! O03P,
+     & id_o04p,   ! O04P,
+     & id_o05p,   ! O05P,
+     & id_o060,   ! O06P,
+     & id_o07p,   ! O07p,
+     & id_o111,   ! O111,
+     & id_o333,   ! O333,
+     & id_o3mp,   ! O3MP,
+     & id_o22n,   ! O22N,
+     & id_o22g,   ! O22G,
+     & id_pcm,    ! pcm,
+     & id_gaus    ! gaus
 c
       implicit none
       logical :: sbflg1, sbflg2

@@ -2517,9 +2517,9 @@ c
      &        /, 8x, 'plastic modulus     ', e10.2
      &        /, 8x, 'dep @ start of step ', f10.6,
      &        /, 8x, 'deq @ start of step ', f10.6 )
- 9016 format( //, 5x, 40hpoint remains elastic.  yield function = ,
+ 9016 format( //, 5x, 'point remains elastic.  yield function = ',
      &        f12.3 ,
-     &  /,5x, 24hstrain energy density = ,f10.4/)
+     &  /,5x, 'strain energy density = ',f10.4/)
  9017 format(10x,i5,i3,' point yields.  f    = ',f12.3 )
  9021 format(10x,i5,i3,' large strain incr. / eps_o =',f12.3 )
  9030 format(10x,i5,i3,' elastic unloading f = ',f12.3 )

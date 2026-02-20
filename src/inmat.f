@@ -1617,7 +1617,7 @@ c                 data item for material
 c
       ok         = .true.
       cur_set_no = num_seg_curve_sets
-      if ( true(dumr) )call splunj
+      if ( true(dum) )call splunj
       if ( local_debug ) then
           write(*,*) '>> curve set table....'
           do ii = 1, num_seg_curve_sets
@@ -2054,7 +2054,7 @@ c
 c                       continue reading keywords
 c
       call reset
-      if( true( dummy ) ) call splunj
+      if( true( dum ) ) call splunj
       if( matchs('properties',10) ) call splunj
       if( matchs('cyclic',6) ) call splunj
       if( local_debug ) write(*,*) '  @ 1'
@@ -2705,7 +2705,7 @@ c
 c
 c
       call reset
-      if( true( dummy ) ) call splunj
+      if( true( dum ) ) call splunj
       if( matchs('properties',10) ) call splunj
       if( matchs_exact('nonlocal') ) nonlocal_analysis = .true.
       if( matchs('cohesive',6) ) call splunj

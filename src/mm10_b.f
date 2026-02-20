@@ -1046,7 +1046,7 @@ c     ****************************************************************
 c
       subroutine mm10_formR1( props, np1, n, vec1, vec2,
      &                        stress, tt, R1, gp )
-      use mm10_defs, only : crystal_props, crystal_state, vec1,
+      use mm10_defs, only : crystal_props, crystal_state,
      &                      size_num_hard, max_uhard
       use mm10_constants, only : one, two
       implicit none

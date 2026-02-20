@@ -440,7 +440,7 @@ c              get up to 6 values from remainder of line
 c              ordering: xx, yy, zz, xy, yz, xz
 c
       do i = 1, 6
-       if( endcrd() ) exit
+       if( endcrd(idum) ) exit
        if( numd( local_vals(i) ) ) cycle
        call entits( bad_data, nc )
        write(out,9000) bad_data(1:nc)

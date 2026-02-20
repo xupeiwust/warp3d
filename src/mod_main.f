@@ -6,7 +6,7 @@ c     *                       written by : rhd                       *
 c     *                                                              *
 c     *              last modified : 6/5/2017 rhd                    *
 c     *                                                              *
-c     *     this small module replaces the old common /erflgs/       *
+c     *     this module replaces the old common /erflgs/       *
 c     *                                                              *
 c     ****************************************************************
 c
@@ -138,7 +138,7 @@ c     *     gradually reduce dependence on common.main               *
 c     *                                                              *
 c     ****************************************************************
 c
-      module main_data
+      module main_data 
 
       logical :: windows_os, linux_os, osx_os
 c
@@ -320,7 +320,8 @@ c                 common.main
 c
 c
       logical :: nonlocal_analysis, modified_mpcs,
-     &           divergence_check, diverge_check_strict
+     &           divergence_check, diverge_check_strict,
+     &           mkl_solve, nasa_vss 
 c
 c
 c                 information for output packets
@@ -487,37 +488,34 @@ c                 support for global forcing solver rebuild
 c
       logical :: force_solver_rebuild
 c
-c                 hollerith constants so current compilers
-c                 stop complaining about stms such as
+c                 see initst.f for initialization
 c
-c                 if( ix .eq. 4hCENT ) ...
-c
-      integer, parameter :: id_node   = 4hNODE,
-     & id_cent   = 4hCENT,
-     & id_curr   = 4hCURR,
-     & id_defa   = 4hDEFA,
-     & id_true   = 4hTRUE,
-     & id_flse   = 4hFLSE,
-     & id_o222   = 4hO222,
-     & id_o14p   = 4hO14P,
-     & id_o09p   = 4hO09P,
-     & id_shrt   = 4hSHRT,
-     & id_long   = 4hLONG,
-     & id_o06p   = 4hO06P,
-     & id_o01p   = 4hO01P,
-     & id_o03p   = 4hO03P,
-     & id_o04p   = 4hO04P,
-     & id_o05p   = 4hO05P,
-     & id_o060   = 4hO06P,
-     & id_o07p   = 4hO07p,
-     & id_o111   = 4hO111,
-     & id_o333   = 4hO333,
-     & id_o3mp   = 4HO3MP,
-     & id_o22n   = 4HO22N,
-     & id_o22g   = 4HO22G,
-     & id_pcm    = 4Hpcm ,  ! requires blank after pcm to make 4 chars
-     & id_gaus   = 4HGAUS,
-     & id_dollar = 4H$      !  requires 3 blanks after $  
+      integer :: id_node,
+     & id_cent,
+     & id_curr,
+     & id_defa,
+     & id_true,
+     & id_flse,
+     & id_o222,
+     & id_o14p,
+     & id_o09p,
+     & id_shrt,
+     & id_long,
+     & id_o06p,
+     & id_o01p,
+     & id_o03p,
+     & id_o04p,
+     & id_o05p,
+     & id_o060,
+     & id_o07p,
+     & id_o111,
+     & id_o333,
+     & id_o3mp,
+     & id_o22n,
+     & id_o22g,
+     & id_pcm ,  ! requires blank after pcm to make 4 chars
+     & id_gaus,
+     & id_dollar      !  requires 3 blanks after $  
 c
       end module
 c     ****************************************************************

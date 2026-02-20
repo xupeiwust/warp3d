@@ -4,7 +4,7 @@ c     *                      subroutine initst                       *
 c     *                                                              *
 c     *                       written by : bh                        *
 c     *                                                              *
-c     *                   last modified : 1/28/2026 rhd              *
+c     *                   last modified : 2/20/2026 rhd              *
 c     *                                                              *
 c     *     at program startup, initializes various variables and    *
 c     *     arrays needed to set up the program correctly.           *
@@ -41,7 +41,7 @@ c
      &                      user_cnstrn_stp_factors, stpchk,
      &                      actual_cnstrn_stp_factors,
      &                      fgm_node_values_defined,
-     &                      fgm_node_values_used,
+     &                      fgm_node_values_used, nasa_vss, mkl_solve,
      &                      fgm_node_values_cols,
      &                      initial_state_option, initial_state_step,
      &                      initial_stresses_input,
@@ -113,7 +113,13 @@ c
       ascii_packet_file_name(1:) = ' '
       batch_mess_fname(1:) = ' '
 c
-
+c                       modern version to properly insert hollerith
+c                       strings into integer variables. formerly
+c                       values set with parameter stm in module
+c                       main_data.
+c      
+      call initst_hollerith ! bottom of this file
+c
 c                       summary of fortran file numbers used in warp3d
 c                       add new ones here....
 c
@@ -381,6 +387,7 @@ c    *      -1 = Lin. Preconditioned Conj. Gradient solver (lnpcg)        *
 c    *           no longer allowed via input. code gradually removed      *
 c    *           DEPRECATED                                               *
 c    *      0, 1, 2, 3, 4, 5,  available                                  *
+c    *      1 = NASA/VSS sparse solver. No OpenMP                         *
 c    *      6 = (not implemented) IBM WSMP                                *
 c    *      7 = Intel MKL Pardiso symmetric (Win, Mac, Linux)             *
 c    *      8 = Intel MKL Pardiso asymmetric (Win, Mac, Linux)            *
@@ -389,11 +396,18 @@ c    **********************************************************************
 c
 c
       old_solver_flag = -2
+      solver_flag = 1
+#ifdef MKL
       solver_flag = 7
+#endif
       solver_out_of_core = .false.
       solver_scr_dir(1:) = './warp3d_ooc_solver'
       solver_memory      = 500
       solver_mkl_iterative = .false.
+      nasa_vss = .false.
+#ifdef MKL
+      mkl_solve = .false.
+#endif
 c
 c                       initialize input error flags
 c
@@ -957,3 +971,73 @@ c
      & /,    '                invalide material model name: ',a,
      & /,    '                job aborted',//)
       end
+c     ****************************************************************
+c     *                                                              *
+c     *              function  initst_hollerith                      *
+c     *                                                              *
+c     *   initialize 4 character values into integer variables       *
+c     *   using modern Fortran. Replaces use of Hollerith            *
+c     *   assignments into integers                                  *
+c     *                                                              *
+c     *               written by: rhd                                *
+c     *                   last modified : 2/13/2026 rhd              *
+c     *                                                              *
+c     ****************************************************************
+c
+      subroutine initst_hollerith
+      use main_data 
+      implicit none
+      integer, external :: warp3d_pack4
+c
+      id_node   = warp3d_pack4( 'NODE' )
+      id_cent   = warp3d_pack4( 'CENT' )
+      id_curr   = warp3d_pack4( 'CURR' )
+      id_defa   = warp3d_pack4( 'DEFA' )
+      id_true   = warp3d_pack4( 'TRUE' )
+      id_flse   = warp3d_pack4( 'FLSE' )
+      id_o222   = warp3d_pack4( 'O222' )
+      id_o14p   = warp3d_pack4( 'O14P' )
+      id_o09p   = warp3d_pack4( 'O09P' )
+      id_shrt   = warp3d_pack4( 'SHRT' )
+      id_long   = warp3d_pack4( 'LONG' )
+      id_o06p   = warp3d_pack4( 'O06P' )
+      id_o01p   = warp3d_pack4( 'O01P' )
+      id_o03p   = warp3d_pack4( 'O03P' )
+      id_o04p   = warp3d_pack4( 'O04P' )
+      id_o05p   = warp3d_pack4( 'O05P' )
+      id_o060   = warp3d_pack4( 'O06P' )
+      id_o07p   = warp3d_pack4( 'O07p' )
+      id_o111   = warp3d_pack4( 'O111' )
+      id_o333   = warp3d_pack4( 'O333' )
+      id_o3mp   = warp3d_pack4( 'O3MP' )
+      id_o22n   = warp3d_pack4( 'O22N' )
+      id_o22g   = warp3d_pack4( 'O22G' )
+      id_pcm    = warp3d_pack4( 'pcm ' )  ! requires blank after pcm to make 4 chars
+      id_gaus   = warp3d_pack4( 'GAUS' )
+      id_dollar = warp3d_pack4( '$   ' )  !  requires 3 blanks after $  
+c
+      return
+      end
+c      
+c     ****************************************************************
+c     *                                                              *
+c     *              function  warp3d_pack4                          *
+c     *                                                              *
+c     *   initialize 4 character values into integer variables       *
+c     *   using modern Fortran. Replaces use of Hollerith            *
+c     *   assignments into integers                                  *
+c     *                                                              *
+c     *               written by: rhd                                *
+c     *                   last modified : 2/13/2026 rhd              *
+c     *                                                              *
+c     ****************************************************************
+c
+      function warp3d_pack4( s ) result(i)
+      character(len=*), intent(in) :: s
+      integer :: i
+      character(len=4) :: t
+      t = '    '
+      t(1:min(4,len_trim(s))) = s(1:min(4,len_trim(s)))
+      i = transfer(t, i)
+      end function warp3d_pack4
+

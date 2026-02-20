@@ -4,7 +4,7 @@ c     *                      subroutine indypm                       *
 c     *                                                              *
 c     *                       written by : bh                        *
 c     *                                                              *
-c     *                   last modified : 11/7/25 rhd                *
+c     *                   last modified : 2/19/26 rhd                *
 c     *                                                              *
 c     *     input parameters controlling how the solution is         *
 c     *     performed for analysis                                   *
@@ -36,6 +36,7 @@ c
      &                      ls_details, ls_min_step_length,
      &                      ls_max_step_length, ls_rho,
      &                      ls_slack_tol, umat_serial,
+     &                      nasa_vss, mkl_solve,  
      &                      initial_state_option, initial_state_step
       use j_data, only :  J_cutoff_active, J_cutoff_restart_file,
      &                    J_cutoff_ratio, J_cutoff_e, J_cutoff_nu,
@@ -198,7 +199,7 @@ c
       else
          call errmsg(174,dum,dums,dumr,dumd)
       end if
-      if( endcrd() ) go to 10
+      if( endcrd(dum) ) go to 10
       if( matchs('next',2) ) then
          extrap_off_next_step = .true.
       else
@@ -447,6 +448,8 @@ c
       solver_flag = 0
       solver_mkl_iterative = .false.
       local_direct_flag = .false.
+      mkl_solve  = .false.
+      nasa_vss   = .false.
       if ( matchs('technique',4) ) call splunj
       if ( matchs('type',4) ) call splunj
 c
@@ -458,12 +461,36 @@ c
           go to 1150
         end if
       end if
+c      
+      if ( matchs('nasa',4) ) then
+        local_direct = .true.
+        if ( endcrd(dum) ) then
+          solver_mkl_iterative = .false.
+          solver_flag = 1
+          nasa_vss  = .true.
+          mkl_solve = .false.
+          go to 1150
+        end if
+      end if
+c      
+      if ( matchs('vss',3) ) then
+        local_direct = .true.
+        if ( endcrd(dum) ) then
+          solver_mkl_iterative = .false.
+          solver_flag = 1
+          nasa_vss  = .true.
+          mkl_solve = .false.
+          go to 1150
+        end if
+      end if
 c
       if ( matchs('pardiso',6) ) then
         local_direct_flag = .true.
         if ( endcrd(dum) ) then
           solver_mkl_iterative = .false.
           solver_flag = 0
+          mkl_solve = .true.
+          nasa_vss = .false.
           go to 1150
         end if
       end if
@@ -475,21 +502,29 @@ c
         if ( endcrd(dum) ) then
                solver_flag = 7
                solver_mkl_iterative = .false.
+               mkl_solve = .true.
+               nasa_vss  = .false.
                go to 1150
         end if
         if (  matchs('direct',6) ) then
                solver_flag = 7
                solver_mkl_iterative = .false.
+               mkl_solve = .true.
+               nasa_vss  = .false.
                go to 1150
         end if
         if (  matchs('windows',6) ) then
                solver_flag = 7
                solver_mkl_iterative = .false.
+               mkl_solve = .true.
+               nasa_vss  = .false.
                go to 1150
         end if
         if ( local_direct_flag ) then
                solver_flag = 7
                solver_mkl_iterative = .false.
+               mkl_solve = .true.
+               nasa_vss  = .false.
                go to 1150
         end if
       end if
@@ -499,6 +534,8 @@ c
       if ( matchs('iterative',8)) then
          solver_mkl_iterative = .true.
          solver_flag = 7
+              mkl_solve = .true.
+              nasa_vss  = .false.
          go to 1150
       end if
       if ( matchs('windows',6) ) solver_flag = 7
@@ -510,15 +547,21 @@ c
       if ( matchs('asymmetric',4)) then
             solver_flag = 8
             asymmetric_assembly = .true.
+              mkl_solve = .true.
+              nasa_vss  = .false.
       end if
 
       if ( matchs('iterative',4)) then
             solver_mkl_iterative = .true.
+              mkl_solve = .true.
+              nasa_vss  = .false.
             go to 1150
       end if
 
       if ( matchs('direct',6)) then
             solver_mkl_iterative = .false.
+              mkl_solve = .true.
+              nasa_vss  = .false.
             go to 1150
       end if
 c
@@ -1089,7 +1132,7 @@ c
       end if
 c
  3510 continue
-       if( endcrd( ) ) go to 10
+       if( endcrd(dum) ) go to 10
        if( matchs_exact(',') ) call splunj
        if( matchs_exact('rho') ) then
           if( numd(ls_rho) ) go to 3510
@@ -1328,7 +1371,7 @@ c
 c
       if( here_debug ) write(out,*) '.. J_cutoff_ratio: ',
      &       J_cutoff_ratio
-      if( endcrd( ) ) return
+      if( endcrd(dum) ) return
 c
       if( .not. matchs_exact('E') ) then
          J_cutoff_active = .false.
@@ -1350,7 +1393,7 @@ c
 c
       if( here_debug ) write(out,*) '.. J_cutoff_e: ',
      &       J_cutoff_e
-      if( endcrd( ) ) return
+      if( endcrd(dum) ) return
 c
       if( .not. matchs_exact('nu') ) then
         J_cutoff_active = .false.
@@ -1374,7 +1417,7 @@ c
      &       J_cutoff_nu
 
 c
-      if( endcrd( ) ) return
+      if( endcrd(dum) ) return
 c
       if( .not. matchs_exact('restart') ) then
          J_cutoff_active = .false.
@@ -1417,6 +1460,7 @@ c
 c
       logical, parameter :: here_debug = .false.
       real :: rdummy
+      integer :: dum
 c
       J_ratio_adaptive_steps = .false.
       J_target_diff  = half
@@ -1441,7 +1485,7 @@ c
 c
       J_ratio_adaptive_steps = .true.
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( matchs_exact('target') ) then ! supports old version
         if( matchs('increase',4) ) call splunj
@@ -1475,7 +1519,7 @@ c
         end if
       end if   ! match on Kr target
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( matchs_exact('Kr') ) then
         if( matchs_exact('min') ) call splunj
@@ -1497,7 +1541,7 @@ c
         end if
       end if   ! match on Kr min limit
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( .not. matchs_exact('J') ) then
          J_ratio_adaptive_steps = .false.  
@@ -1508,7 +1552,7 @@ c
          return
       end if 
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( matchs('increase',4) ) call splunj
 c
@@ -1521,11 +1565,11 @@ c
            return
       end if
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( matchs('increase',4) ) call splunj
 c
-      if( endcrd( rdummy ) ) return
+      if( endcrd( dum ) ) return
 c
       if( .not. numd(J_target_diff) ) then
          J_ratio_adaptive_steps = .false.  
@@ -1597,7 +1641,7 @@ c
 c
       J_compute_step_2_automatic = .true.
 c
-      if( endcrd( ) ) return
+      if( endcrd(dum) ) return
 c
       if( .not. matchs_exact('delta') ) then
          J_compute_step_2_automatic = .false.

@@ -104,7 +104,7 @@ c **********************************************************************
 c                                                                               
 c                                                                               
  511  continue                                                                  
-      if ( true(dumr) ) call splunj                                             
+      if ( true(dum) ) call splunj                                             
       if ( matchs_exact('e') ) then                                             
         if ( .not. numr(young_mod) ) then                                       
          call errmsg( 5,dum,'e   ',dumr,dumd )                                  

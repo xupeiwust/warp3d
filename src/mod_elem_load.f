@@ -4,7 +4,7 @@ c     *                      f-90 module elem_load_data              *
 c     *                                                              *          
 c     *                       written by : asg                       *          
 c     *                                                              *          
-c     *                   last modified : 8/1/13 rhd                 *          
+c     *                   last modified : 2/14/12026 rhd             *          
 c     *                                   chg pointer to allocatable *          
 c     *                                                              *          
 c     *     define the data structures for element face and body     *          
@@ -40,8 +40,6 @@ c
          logical, save :: temp_allocated                                        
 c                                                                               
          integer, parameter :: numfaces = 6                                     
-c                                                                               
-         intrinsic allocated                                                    
 c                                                                               
       end module                                                                
 c                                                                               
