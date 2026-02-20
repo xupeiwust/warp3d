@@ -1,0 +1,61 @@
+      subroutine sparse_adj( neq, irow, icoln, ncof, maxn, nt, xadj,
+     &                       adjncy, jmax, maxan )
+c     
+      implicit none
+c
+      integer, intent(in) :: neq, irow(*), icoln(*), ncof, 
+     &                       maxan(*), maxn
+      integer, intent(inout) :: adjncy(*), xadj(*), nt, jmax 
+c
+c              locals
+c      
+      integer :: i, j, iix, icont, ncont, lcont, kcont   
+      integer, allocatable :: itemp(:), jtemp(:)
+c
+c             nt number of terms in adjncy
+c
+      allocate( itemp(ncof), jtemp(neq) )
+c
+      do i = 1, neq
+        jtemp(i) = 0
+      end do
+      icont = 1
+      ncont = 1
+      lcont = 1
+      jmax = 0
+c
+      xadj(1) =  lcont
+      do i = 1, neq
+      kcont = 0
+        do j = 1, jtemp(i)
+          adjncy(ncont) = itemp(maxan(i)+j-1)
+          ncont = ncont + 1
+          kcont = kcont + 1
+        end do
+        do j = 1, irow(i)
+          iix = icoln(icont)
+          adjncy(ncont) = icoln(icont)
+          ncont = ncont + 1
+          itemp(maxan(i)+jtemp(i)) = iix
+          itemp(maxan(iix)+jtemp(iix)) = i
+          if( jtemp(iix) .ge. maxn ) then
+            write(*,*)' increase the dimension of maxn to ....',maxn
+            call die_gracefully
+          endif
+          jtemp(iix) = jtemp(iix) + 1
+          jtemp(i) = jtemp(i) + 1
+          icont = icont + 1
+          kcont = kcont + 1
+        end do
+        lcont = lcont + kcont
+        xadj(i+1) = lcont
+       jmax = max(jmax,jtemp(i))
+      end do
+c
+      nt = lcont - 1
+      xadj(neq+1) = lcont
+c
+      deallocate( itemp, jtemp )
+c
+      return
+      end
