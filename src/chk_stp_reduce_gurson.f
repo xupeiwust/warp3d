@@ -240,7 +240,8 @@ c
       return                                                                    
 c  
  9338 format(                                                                   
-     &/1x,'>>>>> Note: maximum delta-f:',f8.4,' over last step exceeds ',       
+     &/1x,'>>>>> Note: maximum delta-f:',f8.4,' over last ',
+     & 'step exceeds ',       
      & f5.2,' x allowed delta-f of',f7.3,
      &/12x,' Current step size:',          
      & f7.3, ' reduced by factor of:',f6.2,' to:',f6.2)                
