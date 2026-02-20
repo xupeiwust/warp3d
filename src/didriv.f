@@ -877,7 +877,8 @@ c
  9992 format(/, ' >>> the specified function type and the number of',
      &   /,     '       front nodes/interpolation order are '
      &   /,     '       inconsistent',//)
- 9994 format(/, ' >>> the front nodes are not in order of monotonically',
+ 9994 format(/, ' >>> the front nodes are not in order ',
+     &          'of monotonically',
      &   /,     '       increasing distance from first front node...'
      &   /,     '       first front node in error: ',i7,
      &   /,     "       Did you forget the keyword 'sets' in the ",

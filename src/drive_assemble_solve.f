@@ -4,7 +4,7 @@ c     *                                                              *
 c     *  assemble & solve linear equations for a Newton iteration    *
 c     *                                                              *
 c     *                       written by  : rhd                      *
-c     *                   last modified : 11/7/25 rhd                *
+c     *                   last modified : 2/19/26 rhd                *
 c     *                                                              *
 c     ****************************************************************
 c
@@ -21,7 +21,8 @@ c
      &                        sparse_stiff_file_name, sparse_research  
       use elem_block_data, only : edest_blocks
       use main_data, only : repeat_incid, modified_mpcs,
-     &                      asymmetric_assembly, force_solver_rebuild
+     &                      asymmetric_assembly, force_solver_rebuild,
+     &                      mkl_solve, nasa_vss 
       use stiffness_data, only : ncoeff, big_ncoeff, k_coeffs,
      &                           k_indexes,
      &                           ncoeff_from_assembled_profile
@@ -145,23 +146,37 @@ c              p_vec was set above and is the set of residual
 c              nodal forces at n+1. they include MPC effects as
 c              needed for symmetric MKL solvers.
 c
+c               NASA/VSS symmetric, no threads, direct == 1
 c               pardiso_asymmetric  => solver_flag .eq. 8
 c               pardiso_symmetric   => solver_flag .eq. 7
 c
       select case( solver_flag )
+c
+      case( 1 ) ! NASA/VSS. symmetric sparse. direct only
+c
+       if( local_debug ) write(*,*) '... drive_assem_solve  @ 5a'
+       call direct_sparse_vss( neqns, ncoeff, k_diag, p_vec, 
+     &                        u_vec, k_coeffs, k_ptrs, k_indexes,
+     &                        cpu_stats, itype, out )
+       if( local_debug ) write(*,*) '... drive_assem_solve @ 5b'
 
       case( 7 ) ! symmetric pardiso
 c
-        if( asymmetric_assembly ) then
-          write(out,9120); call die_gracefully
-        end if
         if( local_debug ) write(*,*) '... drive_assem_solve  @ 5a'
-        call pardiso_symmetric( neqns, ncoeff, k_diag, p_vec,
+        if( local_debug ) write(*,*) '....asymmetric_assembly: ', 
+     &                                    asymmetric_assembly
+        if( asymmetric_assembly ) then
+            write(out,9120)
+            call die_gracefully
+        end if            
+#ifdef MKL
+       call pardiso_symmetric( neqns, ncoeff, k_diag, p_vec,
      &                          u_vec, k_coeffs, k_ptrs, k_indexes,
      &                          cpu_stats, itype, out,
      &                          solver_out_of_core, solver_memory,
      &                          solver_scr_dir, solver_mkl_iterative )
         if( local_debug ) write(*,*) '... drive_assem_solve @ 5b'
+#endif
 c
       case( 8 ) ! asymmetric pardiso
 c
@@ -169,18 +184,24 @@ c
           write(out,9110); call die_gracefully
         end if
         if( local_debug ) write(*,*) '... drive_assem_solve  @ 5c'
+#ifdef MKL
         call pardiso_unsymmetric( neqns, nnz, k_ptrs, k_indexes,
      &            k_coeffs,  p_vec, u_vec, cpu_stats, itype, out,
      &            solver_mkl_iterative )
+#endif     
         if( local_debug ) write(*,*) '... drive_assem_solve @ 5d'
 c
       case( 9, 10, 11 ) ! deprecated solvers
 c            
             write(out,9301) solver_flag
             call die_gracefully
+            nasa_vss  = .false.
+            mkl_solve = .false.
  
       case default ! bad solver type
 c
+            nasa_vss  = .false.
+            mkl_solve = .false.
             write(out,9301) solver_flag
             call die_gracefully
 c
@@ -308,13 +329,20 @@ c                 the solution is known from constraints.
 c
 c
       if( local_debug ) write(out,*) '.. @ (1)  '
+c      
       call thyme( 21, 1 )
       if( cpu_stats .and. show_details ) then
+#ifdef MKL
           call mkl_get_version_string( mkl_string )
-          mkl_num_thrds = solver_threads
+#endif
+        if( mkl_solve ) then
+           mkl_num_thrds = solver_threads
              write(out,9400) mkl_num_thrds, mkl_string(45:50),
-     &                       mkl_string(66:73), wcputime(1)
-      end if
+     &                       mkl_string(66:73), wcputime(1)   
+        end if
+        if( nasa_vss ) write(out,9402)  wcputime(1)   
+      end if  
+c      
       if( .not. allocated ( dof_eqn_map ) ) then
           allocate( dof_eqn_map(num_struct_dof) )
           allocate( eqn_node_map(num_struct_dof) )
@@ -467,6 +495,9 @@ c
      & /,15x,'number of MKL threads used      ',i10,
      & /,15x,'MKL version, build: ',5x,a6,1x,a8,
      & /,15x,'starting work                 @ ',f10.2 )
+ 9402  format (
+     &  10x, '>> solver wall time statistics (secs):'
+     & /,15x,'starting work: NASA-VSS       @ ',f10.2 )
  9409  format(
      &  15x, 'finished dof setup            @ ',f10.2 )
  9410  format(
@@ -1174,8 +1205,10 @@ c           plan is to convert to CSR (with existing fn)
 c           and write out in
 c           the format specified above.
 c
+#ifdef MKL
       call pardiso_symmetric_map( n, nnz, diagonal, rhs,values,
      &                   row_ptrs, col_indexes )
+#endif     
       nnz = nnz + n
       open (unit = fileno, file=filename)
       write(*,*) "Writing"

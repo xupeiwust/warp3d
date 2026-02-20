@@ -124,7 +124,7 @@ c
       return                                                                    
 c                                                                               
 c                                                                               
- 3040 format( 1h0, 5x,32hequivalent loads for body forces,                      
+ 3040 format( /, 5x,'equivalent loads for body forces',                      
      &    / 20(/,10x,f20.6 ) )                                                  
  3010 format(1x,10f10.3)                                                        
  3050 format(1x,"total load, vol: ",2f10.4 )                                    

@@ -575,22 +575,18 @@ c              for single point integration of bricks,
 c              compute average stresses, energy density, and
 c              strain at center of element (front coords).
 c              set number of gauss points = one for subsequent loop.
+c
       numipts  = 1
       eaverage = zero  ! all terms
+c      
       do ptno = 1, ngpts
-         do i = 1, 10
-            eaverage(i) = eaverage(i) + crk_sig_tens_gp(i,ptno)
-         end do
-         do i = 11,19
-            eaverage(i) = eaverage(i) + crk_eps_tens_gp(i,ptno)
-         end do
+        eaverage(1:10)  = eaverage(1:10) + crk_sig_tens_gp(1:10,ptno)
+        eaverage(11:19) = eaverage(11:19) +
+     &                       crk_eps_tens_gp(1:9,ptno)
       end do
-      do i = 1, 10
-        crk_sig_tens_gp(i,ngpts+1) = eaverage(i) / dble(ngpts)
-      end do
-      do i = 11, 19
-        crk_eps_tens_gp(i,ngpts+1) = eaverage(i) / dble(ngpts)
-      end do
+c
+      crk_sig_tens_gp(1:10,ngpts+1) = eaverage(1:10) / dble(ngpts)
+      crk_eps_tens_gp(1:9,ngpts+1)  = eaverage(11:19) / dble(ngpts)
 c
       return
       end subroutine dielem_set_one_pt_integration

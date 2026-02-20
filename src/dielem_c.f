@@ -1025,7 +1025,7 @@ c
      &           fnode_temp(mxndel), sfnode_temp(mxndel), index
       double precision :: x1_1, x1_2, measure, d1, d1_old,
      &                    coord_temp(3,mxndel), node_x, node_y,
-     &                    node_z, r, t, rs(4)
+     &                    node_z, r, t, rs(5) ! only4 used.
       logical :: debug
 c
       debug = .false.

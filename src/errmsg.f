@@ -3,7 +3,7 @@ c     *                      suboutine errmsg                        *
 c     *                                                              *
 c     *                       written by : bh                        *
 c     *                                                              *
-c     *                   last modified : 1/6/22 rhd                 *
+c     *                   last modified : 2/14/2026 rhd              *
 c     *                                                              *
 c     *     this subroutine prints assorted error messages in re-    *
 c     *     ponse to calls from all over the program. virtually all  *
@@ -13,25 +13,31 @@ c     ****************************************************************
 c
 c
       subroutine errmsg( errnum, param, sparam, rparam, dparam )
-      use global_data ! old common.main
+c      
+      use global_data 
       use main_data, only : max_step_limit
-      implicit integer (a-z)
+      use constants, only : hundred
+      implicit none
+c
+      integer :: errnum, param
+      character(len=*)  :: sparam
+      real :: rparam
+      double precision :: dparam
+c
       character(len=50) :: string
       character(len=35) :: strng1
-      character(len=8) :: shrtst,shrtst1,shrtst2
+      character(len=8)  :: shrtst,shrtst1,shrtst2
       character(len=24) :: lngstr
       character(len=21) :: strng21
       character(len=29) :: strng29
-      character(len=*) :: sparam
 c
-      double precision :: dparam, hundred
-      real :: rparam
+      integer :: strlng, count, nnode, iter, type, dbnum, element,
+     &           face, elem
+      integer, external :: warp3d_pack4
       integer, save :: high_lvl_count = 0
       logical, save :: mess_61, write_msg_255, write_msg_321
       integer, save :: count_150=0
       integer, save :: count_136=0
-      integer, parameter :: id_pcm = 4hpcm  
-      data hundred /100.0/
       data mess_61, write_msg_255, write_msg_321
      &     / .true., .true., .true. /
 c
@@ -1460,7 +1466,7 @@ c
  1440 continue
       num_error = num_error + 1
 c
-      if(param.eq.id_pcm ) then
+      if( param == warp3d_pack4("pcm ") ) then
          shrtst= 'dyn stfn'
       else
          shrtst= '  mass  '
@@ -3272,6 +3278,7 @@ c
 c
       subroutine errmsg2( errnum, param, sparam, rparam, dparam )
       use global_data ! old common.main
+      use constants, only : hundred
       implicit none
 c
       integer :: errnum, param
@@ -3282,7 +3289,6 @@ c
       integer :: strlng
       character(len=50) :: string
 c
-      double precision, parameter :: hundred = 100.0d0
       logical, parameter :: mess_61 = .true.
 c
 c
@@ -4043,8 +4049,9 @@ c     *                                                              *
 c     ****************************************************************
 c
       subroutine errmsg3( out, param )
-      implicit integer (a-z)
+      implicit none
 c
+      integer :: out, param
       go to ( 191, 192, 193, 194, 195, 196, 197, 198, 199,
      &        200, 210, 220, 230, 240, 250 ), param
  191  continue

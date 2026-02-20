@@ -63,10 +63,11 @@ c
 c                  set number of threads Pardiso must use. Turn off
 c                  dynamic adjust of thread count.
 c
+#ifdef MKL
       call mkl_set_num_threads( solver_threads )
       call omp_set_num_threads( solver_threads )
       call mkl_set_dynamic( 1 )
-
+#endif
       select case( itype )
        case( 1 )
         call pardiso_unsymmetric_setup
@@ -143,23 +144,27 @@ c             if previously sovled a set of equations,release memory.
 c
       if( pardiso_mat_defined ) then
         phase = -1
+#ifdef MKL        
         call pardiso( pt, maxfct, mnum, mtype, phase, n, k_coeffs,
      &       k_ptrs, k_indexes, perm, nrhs, iparm, msglvl, p_vec,
      &       u_vec, error )
         pardiso_mat_defined = .false.
         call warp3d_pardiso_mess( 6, out, error, mkl_ooc_flag,
      &                            cpu_stats, iparm )
+#endif     
       end if
       call warp3d_pardiso_mess( 1, out, error, mkl_ooc_flag,
      &                         cpu_stats, iparm )
 c
       phase = 11 ! reordering and symbolic factorization
+#ifdef MKL
       call pardiso( pt, maxfct, mnum, mtype, phase, n, k_coeffs,
      &     k_ptrs, k_indexes, perm, nrhs, iparm, msglvl, p_vec,
      &     u_vec, error )
       pardiso_mat_defined = .true.
       call warp3d_pardiso_mess( 2, out, error, mkl_ooc_flag,
      &                          cpu_stats, iparm )
+#endif     
 c
       call thyme( 23, 2 )
       return
@@ -179,9 +184,11 @@ c
      &      call warp3d_pardiso_mess( 7, out, error, mkl_ooc_flag,
      &                               cpu_stats, iparm)
       phase = -1
+#ifdef MKL      
       call pardiso(pt, maxfct, mnum, mtype, phase, n, k_coeffs,
      &       k_ptrs, k_indexes, perm, nrhs, iparm, msglvl, p_vec,
      &       u_vec, error)
+#endif     
       pardiso_mat_defined = .false.
       num_calls = 0
       return
@@ -200,11 +207,13 @@ c
       num_calls = num_calls + 1
       phase = 23
       call thyme( 26, 1 )
+#ifdef MKL
       call pardiso(pt, maxfct, mnum, mtype, phase, n, k_coeffs,
      &     k_ptrs, k_indexes, perm, nrhs, iparm, msglvl, p_vec,
      &     u_vec, error)
       call warp3d_pardiso_mess( 5, out, error, mkl_ooc_flag,
      &                          cpu_stats, iparm )
+#endif     
       call thyme( 26, 2 )
 c
       return
@@ -226,11 +235,13 @@ c
       phase = 23 ! solve with iterative refinement
       call warp3d_pardiso_mess( 9, out, error, mkl_ooc_flag,
      &                          cpu_stats, iparm )
+#ifdef MKL
       call pardiso(pt, maxfct, mnum, mtype, phase, n, k_coeffs,
      &     k_ptrs, k_indexes, perm, nrhs, iparm, msglvl, p_vec,
      &     u_vec, error)
       call warp3d_pardiso_mess( 8, out, error, mkl_ooc_flag,
      &                          cpu_stats, iparm )
+#endif     
       call thyme( 25, 2 )
       return
 
