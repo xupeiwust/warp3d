@@ -799,7 +799,6 @@ c
 c                    local declarations
 c
       integer :: bit_flags, curve_set_number, first_curve, no_pts
-      integer, intrinsic :: iand
       real :: dumr
       double precision :: dumd
 c
@@ -1142,7 +1141,6 @@ c
 c                    local
 c
       integer :: i, bit_flags
-      integer, intrinsic :: iand
 c
       do i = 1, span
         local_work%e_vec(i)       = props(7,i)
@@ -1233,7 +1231,6 @@ c
 c                    local
 c
       integer :: matnum, i, bit_flags
-      integer, intrinsic :: iand
 c
 c                  NOTE:  at present, all elements in the block must be
 c                         same cyclic material defined by the user.
@@ -1331,7 +1328,6 @@ c                    local
 c
       integer :: i, jout, felem, bit_flags, matnum
       logical :: local_debug
-      integer, intrinsic :: iand
 c
       local_debug = .false.
       matnum = local_work%matnum
@@ -1419,7 +1415,6 @@ c
 c                    local
 c
       integer :: matnum, i, bit_flags
-      integer, intrinsic :: iand
 c
       matnum = local_work%matnum
 c
@@ -1487,7 +1482,6 @@ c
 c                    local
 c
       integer :: i, matnum, bit_flags
-      integer, intrinsic :: iand
 c
       matnum = local_work%matnum
 c

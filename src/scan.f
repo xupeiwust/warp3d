@@ -534,9 +534,9 @@ c
       stop                                                                      
  9999 return                                                                    
 c                                                                               
- 1001 format(40h0 .....end of file - program terminated  /)                     
- 1002 format(40h0 .....input error - program terminated  /)                     
- 1003 format(40h0 .....file list overflow                /)                     
+ 1001 format(' .....end of file - program terminated  ', /)                     
+ 1002 format(' .....input error - program terminated  ', /)                     
+ 1003 format(' .....file list overflow                ', /)                     
  1004 format(/,                                                                 
      & '>> ERROR:  text string mismatch in scanms....',/,                       
      & '           lena, lenb, nchar: ',3i6,/,                                  
@@ -1591,7 +1591,8 @@ c
       implicit none
 c                                                                               
 c         debug - all character output at 4 per word                            
-c                                                                               
+c             
+      write(iout,fmt="(//)")                                                                  
       write(iout,1001)                                                          
       write(iout,1002)recsiz, limit, mark, echar, echo, promt, ilabel,          
      1                init, point, menu, leof, eol, autord, commnt,             
@@ -1602,58 +1603,58 @@ c
       write(iout,1005)entity, ival, mode,nchar, nwd,                            
      1                next, icolmn                                              
       return                                                                    
- 1001 format(1h1/24h ***********************/                                   
-     1           24h * s c a n   d e b u g */                                   
-     2           24h ***********************/)                                  
- 1002 format( 5x, 25hc o n t r o l   s t a t e/                                 
-     1       10x, 14hrecord size - , i2/                                        
-     2       10x, 15hrecord limit - , i2/                                       
-     3       10x, 13hrecord end - , i2/                                         
-     4       10x, 23hrecord end character - , a1/                               
-     5       10x, 14hecho switch - , l1/                                        
-     6       10x, 16hprompt switch - , l1/                                      
-     7       10x, 13hline label - , i5/                                         
-     8       10x, 24hinitialization switch - , l1/                              
-     9       10x, 15hpoint switch - , l1/                                       
-     a       10x, 14hmenu switch - , l1/                                        
-     b       10x, 21hend of file switch - , l1/                                 
-     c       10x, 21hend of line switch - , l1/                                 
-     d       10x, 19hauto read switch - ,l1/                                    
-     e       10x, 17hcomment switch - , l1/                                     
-     f       10x, 14hsign switch - , l1/)                                       
- 1003 format( 5x, 17hi / o   s t a t e/                                         
-     1       10x, 13hinput unit - , i2/                                         
-     2       10x, 14houtput unit - , i2/                                        
-     3       10x, 14hremote unit - , i2/                                        
-     4       10x, 21hfile stack pointer - , i2/                                 
-     5       10x, 13hfile limit - , i2/                                         
-     6       10x, 13hfile stack - , 10(i2, 2x)/)                                
- 1004 format( 5x, 19hs c a n   s t a t e/                                       
-     1       10x, 9hcolumn - , i2/                                              
-     2       10x, 7hjump - , i2/                                                
-     3       10x, 16hentity number - , i2/                                      
-     4       10x, 15hstring state - , i2/                                       
-     5       10x, 13hskip state - , i2/                                         
-     6       10x, 14hread switch - , l1/                                        
-     7       10x, 14hrecord size - , i2/                                        
-     8       10x, 13hinput line - , 81a1/                                       
-     9       10x, 18hinternal record - , 20(i3,1x)/28x,20(i3,1x)/               
+ 1001 format(' ***********************',/,                                   
+     1       ' * s c a n   d e b u g *',/,                                   
+     2       ' ***********************',/)                                  
+ 1002 format( 5x, 'c o n t r o l   s t a t e'/                                 
+     1       10x, 'record size - ', i2/                                        
+     2       10x, 'record limit - ', i2/                                       
+     3       10x, 'record end - ', i2/                                         
+     4       10x, 'record end character - ', a1/                               
+     5       10x, 'echo switch - ', l1/                                        
+     6       10x, 'prompt switch - ', l1/                                      
+     7       10x, 'line label - ', i5/                                         
+     8       10x, 'initialization switch - ', l1/                              
+     9       10x, 'point switch - ', l1/                                       
+     a       10x, 'menu switch - ', l1/                                        
+     b       10x, 'end of file switch - ', l1/                                 
+     c       10x, 'end of line switch - ', l1/                                 
+     d       10x, 'auto read switch - ',l1/                                    
+     e       10x, 'comment switch - ', l1/                                     
+     f       10x, 'sign switch - ', l1/)                                       
+ 1003 format( 5x, 'i / o   s t a t e'/                                         
+     1       10x, 'input unit - ', i2/                                         
+     2       10x, 'output unit - ', i2/                                        
+     3       10x, 'remote unit - ', i2/                                        
+     4       10x, 'file stack pointer - ', i2/                                 
+     5       10x, 'file limit - ', i2/                                         
+     6       10x, 'file stack - ', 10(i2, 2x)/)                                
+ 1004 format( 5x, 's c a n   s t a t e',/,                                      
+     1       10x, 'column - ', i2/                                              
+     2       10x, 'jump - ', i2/                                                
+     3       10x, 'entity number - ', i2/                                      
+     4       10x, 'string state - ', i2/                                       
+     5       10x, 'skip state - ', i2/                                         
+     6       10x, 'read switch - ', l1/                                        
+     7       10x, 'record size - ', i2/                                        
+     8       10x, 'input line - ', 81a1/                                       
+     9       10x, 'internal record - ', 20(i3,1x)/28x,20(i3,1x)/               
      a            28x,20(i3,1x)/28x,21(i3,1x)/                                  
-     b       10x, 8hclass - , 20(i3,1x)/18x,20(i3,1x)/18x,20(i3,1x)/            
+     b       10x, 'class - ', 20(i3,1x)/18x,20(i3,1x)/18x,20(i3,1x)/            
      c            18x,21(i3,1x)/                                                
-     d       10x, 9hdigits - , 20(i3,1x)/19x,20(i3,1x)/19x,20(i3,1x)/           
+     d       10x, 'digits - ', 20(i3,1x)/19x,20(i3,1x)/19x,20(i3,1x)/           
      e            19x,21(i3,1x)/)                                               
 c                                                                               
 c                the a4 format is machine dependent                             
 c                                                                               
- 1005 format( 5x, 11he n t i t y/                                               
-     1       10x, 9hentity - , 20a4/                                            
-     4       10x, 7hival - , z8,1x,z8/                                          
-     5       10x, 7hmode - , i2/                                                
-     6       10x, 12hcharacter - , i2/                                          
-     7       10x, 8hwords - , i2/                                               
-     8       10x, 7hnext - , l1/                                                
-     9       10x, 9hcolumn - , i2///)                                           
+ 1005 format( 5x, 'e n t i t y',/,                                               
+     1       10x, 'entity - ', 20a4/                                            
+     4       10x, 'ival - ', z8,1x,z8/                                          
+     5       10x, 'mode - ', i2/                                                
+     6       10x, 'character - ', i2/                                          
+     7       10x, 'words - ', i2/                                               
+     8       10x, 'next - ', l1/                                                
+     9       10x, 'column - ', i2///)                                           
       end                                                                       
 c **********************************************************************        
 c *                                                                    *        
@@ -1976,7 +1977,7 @@ c
       reread = .false.                                                          
       incol = recsiz  
       if (  promt .and. ( inunit .eq. inremo ) )                                
-     1                call wrnocr( 3h > , iotrem )                              
+     1                call wrnocr( " > ", iotrem )                              
       call scanin( inunit, rcard, incol, ierr )  
       if ( incol .eq. 0 ) go to 10                                              
       if( ierr < 0 ) go to 20                                                   
@@ -2238,8 +2239,9 @@ c
 c                                                                               
 c                write a prompt to a terminal without a carriage                
 c                return.                                                        
-c                                                                               
-      integer :: outrem, prompt                                                  
+c         
+      character(len=3) :: prompt                                                                      
+      integer :: outrem                                                
       write(outrem,fmt='(a3$)' ) prompt                                         
       return                                                                    
       end                                                                       
@@ -2271,376 +2273,6 @@ c
       end do                                                                    
 c                                                                               
       end                                                                       
-!c     ****************************************************************
-!c     *                                                              *
-!c     *                  subroutine trlist   (deprecated)            *
-!c     *                                                              *
-!c     *                       written by : rhd                       *
-!c     *                                                              *
-!c     *     no longer used as of 12/4/2019. replaced by              *
-!c     *     trlist_allocated in mod_trlist,f                         *
-!c     *     introduced to make the user provided vector for storage  *
-!c     *     of the list allocatable and resizable  as the list is    *
-!c     *     parsed.                                                  * 
-!c     *                                                              *   
-!c     *     commented source code here left for historical           *
-!c     *     reference only                                           *
-!c     *                                                              *
-!c     ****************************************************************
-!c
-!      subroutine trlist( list, mlist, iall, nlist, ierr )
-!c
-!c          scan action to input a list of integer terms.
-!c          the input can be a conventional integerlist or
-!c          a string containing the name of a previously defined
-!c          user list.
-!c
-!c          see trscan_list for all details on a conventional
-!c          integerlist.
-!c
-!c          dummy arguments
-!c              list      (output) - list of parsed input - as described
-!c              mlist     (input)  - allowable size of list
-!c              iall      (input)  - value of 'all'
-!c                                   = 0 - 'all' is not acceptable
-!c              nlist     (output) - number of terms stored in list
-!c              ierr      (output) - error code
-!c                                   = 1 - no error
-!c                                   = 2 - parse rules failded
-!c                                   = 3 - list overflow
-!c                                   = 4 - list not found
-!c
-!c
-!c          parsing rules:
-!c           - on entry, the calling routine has made the current scan entity
-!c             either the start of a conventional integer list or a string
-!c           - on exit we must have scan entity be the next item on line
-!c             after the string. this is compatible with the processing of
-!c             conventional integerlists.
-!c           - this routine does not touch the internal scan logical
-!c             flag tracking tru/false tests. here we do not know
-!c             what the user code expects so we leave exactly like simple
-!c             intergerlist
-!c
-!      use main_data, only : user_lists
-!      implicit integer(a-z)
-!      include 'param_def'
-!      dimension list(mlist)
-!      character lname*24, name*80
-!      logical isstring, scanms, debug
-!      data debug / .false. /
-!c
-!c          if we have a regular <integerlist> just process as before and
-!c          return
-!c
-!      list = 0 ! all entries
-!      call trscan_list( list, mlist, iall, nlist, ierr )
-!      if( ierr .ne. 4 ) return
-!c
-!c          <integerlist> not found. check for user defined list name
-!c          in a string. scan entity is
-!c          already the string if it is there. use a scan function that
-!c          does not touch the internal scanner flag (next)
-!c
-!      if( .not. isstring(idummy) ) return
-!c
-!c          user defined list. find list in table, insert into list
-!c          space passed in. advance scanner to next entity on return to
-!c          match behavior of conventional integerlist.
-!
-!      lname(1:24) = ' '; call entits( name, nchars )
-!      if( nchars > 24 ) nchars = 24; lname(1:nchars) = name(1:nchars)
-!      if( debug )  write(*,*) "... list id: ", lname
-!c
-!      list_col  = 0
-!      do i = 1, max_user_lists
-!       if( scanms( user_lists(i)%name, lname, 24 ) ) then
-!         list_col = i; go to 100
-!       end if
-!      end do
-!c
-!      ierr = 4
-!      return
-!c
-!c          list found. check for overflow of space provided for
-!c          list. extract values from stored lists and return.
-!c          put the next line entity into the scanner.
-!c
-! 100  continue
-!      stored_length = user_lists(i)%length_list
-!      if( stored_length == 0 ) then
-!         ierr = 2
-!         call ulist_error( 27 )
-!         call scan
-!         return
-!      end if
-!      if( mlist < stored_length ) then
-!        ierr = 3; return
-!      end if
-!      nlist = stored_length
-!      list(1:nlist) = user_lists(list_col)%list(1:nlist)
-!      ierr = 1
-!      if( debug ) then
-!        write(*,*) '.. list_col, stored_length ', list_col, nlist
-!        write(*,*) 'list: ', list(1:nlist)
-!      end if
-!      call scan
-!      return
-!c
-!      end
-!c     ****************************************************************           
-!c     *                                                              *           
-!c     *      subroutine trscan_list (deprecated)                     *
-!c     *                                                              *           
-!c     *     no longer used as of 12/4/2019. replaced by              *
-!c     *     trlist_allocated in mod_trlist,f                         *
-!c     *     introduced to make the user provided vector for storage  *
-!c     *     of the list allocatable and resizable  as the list is    *
-!c     *     parsed.                                                  * 
-!c     *                                                              *   
-!c     *     commented source code here left for historical           *
-!c     *     reference only                                           *
-!c     *                                                              *           
-!c     ****************************************************************           
-!      subroutine trscan_list ( list, mlist, iall, nlist, ierr ) 
-!      use scaner
-!c
-!      implicit none                
-!c                                                                               
-!c          scan action to input a list of integer terms                         
-!c              each action may be delimitted by a comma                         
-!c              a comma preceeding an eol indicates continuation                 
-!c              terms may be:                                                    
-!c                   a) <integer>                                                
-!c                   b) <integer1> - <integer2>                                  
-!c                   c) <integer1> to <integer2>                                 
-!c                   d) <integer1> - <integer2> by <integer3>                    
-!c                   e) <integer1> to <integer2> by <integer3>                   
-!c                   f) all                                                      
-!c              type a stores <integer>  in list                                 
-!c              type b and c stores <integer1>, -<integer2>, 1 in list           
-!c              type d and e stores <integer1>, -<integer2>, <integer3>          
-!c              in list                                                          
-!c              type f stores 1, -iall, 1 in list                                
-!c                                                                               
-!c         dummy arguments                                                       
-!c              list      (output) - list of parsed input - as described         
-!c              mlist     (input)  - allowable size of list                      
-!c              iall      (input)  - value of 'all'                              
-!c                                   = 0 - 'all' is not acceptable               
-!c              nlist     (output) - number of terms stored in list              
-!c              ierr      (output) - error code                                  
-!c                                   = 1 - no error                              
-!c                                   = 2 - parse rules failded                   
-!c                                   = 3 - list overflow                         
-!c                                   = 4 - list not found                        
-!c                                                                               
-!c         called subprograms                                                    
-!c              scan                                                             
-!c              rdline                                                           
-!c              scanmc                                                           
-!c                                                                               
-!c         local variables                                                       
-!c              istate            - fsa states                                   
-!c              nstate            - next state table                             
-!c              iclass            - class of input                               
-!c              ifsa              - action table                                 
-!c              iact              - action to do                                 
-!c              iby               - hollerth 'by'                                
-!c              ito               - hollerth 'to'                                
-!c              jall              - hollerth 'all'                               
-!c              istart            - flag set to true on first scan               
-!c              iovfl             - flag set to true on overflow                 
-!c                                                                               
-!c         algorithm terms                                                       
-!c              states   - 1 = start                                             
-!c                         2 = item (integer)                                    
-!c                         3 = delimiter (,)                                     
-!c                         4 = iteration (-, to)                                 
-!c                         5 = increment (by)                                    
-!c                         6 = delta (increment integer)                         
-!c              classes  - 1 = integer                                           
-!c                         2 = alpha 'to' or seperator '-'                       
-!c                         3 = alpha 'by'                                        
-!c                         4 = seperator ','                                     
-!c                         5 = end of line                                       
-!c                         6 = else                                              
-!c              actions  - 0 = switch state                                      
-!c                         1 = done                                              
-!c                         2 = error                                             
-!c                         3 = save inger, - value implies iteration te          
-!c                         4 = read line                                         
-!c                         5 = save -1*integer                                   
-!c                         6 = save 1, save integer                              
-!c                         7 = save 1                                            
-!c                         8 = save 1, done                                      
-!c                         9 = test overflow                                     
-!c                        10 = save iteration increment                          
-!c                                                                               
-!c      
-!      integer :: mlist, list(mlist), iall, nlist, ierr                                                                         
-!      integer :: ifsa(6,6), nstate(6,6), istate, iclass, iact                             
-!      logical :: istart, iovfl                                                     
-!      logical, external :: scanmc                                                            
-!      real :: rby(1)  = real( Z'20207962', kind=kind(rby) ) ! by
-!      real :: rto(1)  = real( Z'20206F74', kind=kind(rto) ) ! to
-!      real :: rall(1) = real( Z'206C6C61', kind=kind(rall) ) ! all
-!c                                                                               
-!c         transfer table                                                        
-!c                                                                               
-!      data ifsa/                                                                
-!     1            3, 1, 1, 0, 1, 1,                                             
-!     2            3, 9, 2, 0, 1, 1,                                             
-!     3            3, 2, 2, 2, 4, 2,                                             
-!     4            5, 2, 2, 2, 2, 2,                                             
-!     5            6, 2, 0, 7, 8, 8,                                             
-!     6           10, 2, 2, 0, 4, 2/                                             
-!c                                                                               
-!c         next state table                                                      
-!c                                                                               
-!      data nstate/                                                              
-!     1            2, 0, 0, 1, 0, 0,                                             
-!     2            2, 4, 0, 3, 0, 0,                                             
-!     3            2, 0, 0, 0, 1, 0,                                             
-!     4            5, 0, 0, 0, 0, 0,                                             
-!     5            2, 0, 6, 3, 0, 0,                                             
-!     6            2, 0, 0, 6, 6, 0/                                             
-!c                                                                               
-!c         initialy in start state                                               
-!c                                                                               
-!      istart = .true.                                                           
-!      iovfl = .false.                                                           
-!      nlist = 1                                                                 
-!      istate = 1                                                                
-!c                                                                               
-!c         scan and determine class                                              
-!c                                                                               
-! 100  iclass = 6                                                                
-!      if(.not.istart)call scan                                                  
-!      if(mode.ne.9)go to 110                                                    
-!      iclass = 5                                                                
-!      go to 140                                                                 
-! 110  if(mode.ne.6)go to 120                                                    
-!      if(ivalue.eq.3)iclass = 2                                                 
-!      if(ivalue.eq.16)iclass = 4                                                
-!      go to 140                                                                 
-! 120  if( mode.ne.3 )go to 130                                                  
-!      if( scanmc(entity,rby,2) .and. nchar.eq.2 ) iclass = 3                 
-!      if( scanmc(entity,rto,2) .and. nchar.eq.2 ) iclass = 2                 
-!      if( scanmc(entity,rall,3) .and. istart .and. iall.ne.0                 
-!     &    .and. nchar.eq.3 ) go to 350                                          
-!      go to 140                                                                 
-! 130  if(mode.ne.1)go to 140                                                    
-!      iclass = 1                                                                
-!c                                                                               
-!c         determine next state and action                                       
-!c                                                                               
-! 140  iact = ifsa(iclass,istate)+1                                              
-!      istate = nstate(iclass,istate)                                            
-!      if(iact.ne.2)istart=.false.                                               
-!c                                                                               
-!c         action transfer, skip store on overflow                               
-!c                                                                               
-!      if(iovfl.and.(iact.eq.4.or.iact.eq.6.or.iact.eq.7.or.                     
-!     1              iact.eq.8.or.iact.eq.10))go to 100                          
-!      go to (100, 210, 220, 230, 250, 260, 270, 280, 290, 310, 320              
-!     1       ), iact                                                            
-!c                                                                               
-!c         done                                                                  
-!c                                                                               
-! 210  ierr = 1                                                                  
-!      nlist = nlist-1                                                           
-!      if(istart)ierr = 4                                                        
-!      if(iovfl)ierr = 3                                                         
-!      if(list(1).lt.0.and.nlist.gt.1)ierr = 2                                   
-!      return                                                                    
-!c                                                                               
-!c         error - parse                                                         
-!c                                                                               
-! 220  ierr = 2                                                                  
-!      nlist = nlist-1                                                           
-!      return                                                                    
-!c                                                                               
-!c         save integer, -value becomes iteration bound                          
-!c                                                                               
-! 230  if(nlist.le.mlist)go to 240                                               
-!      iovfl = .true.                                                            
-!      go to 100                                                                 
-! 240  list(nlist) = ivalue                                                      
-!      nlist = nlist+1                                                           
-!      if(ivalue.lt.0.and.nlist.eq.2)go to 100                                   
-!      if(ivalue.lt.0)istate = 5                                                 
-!      go to 100                                                                 
-!c                                                                               
-!c         read line                                                             
-!c                                                                               
-! 250  call rdline                                                               
-!      go to 100                                                                 
-!c                                                                               
-!c         save -1*integer                                                       
-!c                                                                               
-! 260  list(nlist) = -ivalue                                                     
-!      if(ivalue.lt.0)go to 220                                                  
-!      nlist = nlist+1                                                           
-!      go to 100                                                                 
-!c                                                                               
-!c         save 1, save integer                                                  
-!c                                                                               
-! 270  list(nlist) = 1                                                           
-!      list(nlist+1) = ivalue                                                    
-!      nlist = nlist+2                                                           
-!      go to 100                                                                 
-!c                                                                               
-!c         save 1                                                                
-!c                                                                               
-! 280  list(nlist) = 1                                                           
-!      nlist = nlist+1                                                           
-!      go to 100                                                                 
-!c                                                                               
-!c         save 1, done                                                          
-!c                                                                               
-! 290  if(iovfl)go to 300                                                        
-!      list(nlist) = 1                                                           
-! 300  ierr = 1                                                                  
-!      if(iovfl)ierr = 3                                                         
-!      if(list(1).lt.0.and.nlist.ne.1)ierr = 2                                   
-!      return                                                                    
-!c                                                                               
-!c         test for overflow in iteration term                                   
-!c                                                                               
-! 310  if(nlist+1.gt.mlist)iovfl = .true.                                        
-!      go to 100                                                                 
-!c                                                                               
-!c         save integer for increment                                            
-!c                                                                               
-! 320  if(nlist.le.mlist)go to 330                                               
-!      iovfl = .true.                                                            
-!      go to 100                                                                 
-! 330  list(nlist) = ivalue                                                      
-!      nlist = nlist+1                                                           
-!      go to 100                                                                 
-!c                                                                               
-!c        all, done                                                              
-!c                                                                               
-! 350  if(mlist.lt.3)go to 360                                                   
-!      list(1) = 1                                                               
-!      list(2) = -iall                                                           
-!      list(3) = 1                                                               
-!      nlist = 3                                                                 
-!      ierr = 1                                                                  
-!      call scan                                                                 
-!      if(mode.ne.6)return                                                       
-!      if(ivalue.ne.16)return                                                    
-!      call scan                                                                 
-!      if(mode.ne.9)return                                                       
-!      call rdline                                                               
-!      call scan                                                                 
-!      return                                                                    
-! 360  ierr = 3                                                                  
-!      nlist = 0                                                                 
-!      return                                                                    
-!c                                                                               
-!      end                                                                       
                                                                                 
 c     ****************************************************************
 c     *                                                              *

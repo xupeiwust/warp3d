@@ -12,7 +12,7 @@ c     ****************************************************************
 c
 c
       subroutine reopen( resnam, resfil, sbflg1, sbflg2 )
-      use global_data ! old common.main
+      use global_data
       use main_data
       use elem_block_data, only : nonlocal_flags, nonlocal_data_n,
      &                            nonlocal_data_n1
@@ -157,7 +157,7 @@ c
      &              solver_mkl_iterative, output_packets,
      &              temperatures_ref, fgm_node_values_defined,
      &              fgm_node_values_used,
-     &              time_assembly, 
+     &              time_assembly, mkl_solve, nasa_vss,
      &              nonlocal_analysis,
      &              umat_serial, umat_used, asymmetric_assembly,
      &              extrapolate, extrap_off_next_step,

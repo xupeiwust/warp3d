@@ -16,7 +16,8 @@ c
 c                                                                               
 c                                                                               
       subroutine star_com                                                       
-      use global_data ! old common.main
+      use global_data
+      use main_data, only : id_dollar
       use scan_macros
       implicit none          
 c        
@@ -79,7 +80,7 @@ c
       if( matchs('echo',4) ) then                                            
          nblank= 20                                                             
          reclen= 80                                                             
-         endchr= 1h$                                                            
+         endchr= id_dollar                                                           
          promsw= .false.                                                        
          comsw= .false.                                                         
          atrdsw= .false.                                                        
